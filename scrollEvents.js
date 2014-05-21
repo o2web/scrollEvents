@@ -10,21 +10,48 @@ window.se = {
 
 (function($){
 
+	Function.prototype.clone = function() {
+	    var that = this;
+	    var temp = function temporary() { return that.apply(this, arguments); };
+	    for(var key in this) {
+	        if (this.hasOwnProperty(key)) {
+	            temp[key] = this[key];
+	        }
+	    }
+	    return temp;
+	};
+
 	$.extend($.fn, {
 		scrollEvents :function(args){
-			if(args=='destroy'){
-				$(window).off('scroll', eventScroller).off('resize',resizeScroller);
-				window.events = [];
+			if(typeof(args)=='string'){
+				if(args=='destroy'){
+					$(window).off('scroll', eventScroller).off('resize',resizeScroller);
+					window.events = [];
+				}
+				else if(args=='update'){
+					resizeScroller();
+					eventScroller('update');
+				}
+				else if(args=='disable' || args=='enable'){
+					var elements = $(this);
+					for(var i=0; i<window.se.events.length; i++){
+						var e = window.se.events[i];
+						for(var j=0; j<elements.length; j++){
+							var element = elements[j];
+							if(e.selector[0] == element){
+								e.disabled = args=='disable';
+							}
+						}
+					}
+				}
 				return;
 			}
-			if(args=='refresh'){
-				eventScroller('refresh');
-				return;
-			}
-			$(this).each(function(){	
+			
+			$(this).each(function(k,v){	
+
 				var e = $.extend(true,{
 						selector: $(this),
-						visibleFn:function(){},
+						visibleFn: false,
 						upFn:null,
 						downFn:null,
 						once:true,
@@ -32,11 +59,14 @@ window.se = {
 						visible:false,
 						h:$(this).outerHeight(),
 						t:0,
-						b:$(this).outerHeight()
+						b:$(this).outerHeight(),
+						i: k,
+						disabled: false
 					}, args);
+				e.visibleFn = e.visibleFn ? args.visibleFn.clone() : function(){};
 				window.se.events.push(e);
 			});
-
+			
 			$(window).off('scroll', eventScroller).off('resize',resizeScroller);
 			$(window).on('scroll', eventScroller).on('resize',resizeScroller);
 		}			
@@ -48,31 +78,37 @@ window.se = {
 		se.b = se.t+se.wh;
 		for(var i=0; i<se.events.length; i++){
 			var e = se.events[i];
-			var j = i;
-			
-			if((e.visible||arg=='refresh') && e.b <= se.t){
-				if(!e.once){
-					$(window).off('scroll',e.visibleFn);
+			if(!e.disabled){
+				if((e.visible||arg=='update') && e.b <= se.t){
+					if(!e.once){
+						$(window).off('scroll', e.visibleFn);
+					}
+					if(e.upFn && typeof(e.upFn)=='function'){
+						e.upFn();
+					}
+					e.visible=false;
+				}else if((e.visible||arg=='update') && e.t >= se.b){
+					if(!e.once){
+						$(window).off('scroll', e.visibleFn);
+					}
+					if(e.downFn && typeof(e.downFn)=='function'){
+						e.downFn();
+					}
+					e.visible=false;
+				}else if((!e.visible||arg=='update') && e.t < se.b && e.b > se.t && e.visibleFn){
+					if(!e.once){
+						var j = i+0;
+						$(window).on('scroll', {
+								delta: function(){return Math.round( ( se.t - (se.events[j].t - se.wh) ) / ( se.events[j].h + se.wh) *100)/100 },
+								selector: e.selector,
+								index: e.i,
+								height: e.h
+							}, e.visibleFn);
+					}else{
+						e.visibleFn();
+					}
+					e.visible=true;
 				}
-				else if(e.upFn && typeof(e.upFn)=='function'){
-					e.upFn();
-				}
-				e.visible=false;
-			}else if((e.visible||arg=='refresh') && e.t >= se.b){
-				if(e.once && e.downFn && typeof(e.downFn)=='function'){
-					e.downFn();
-				}
-				e.visible=false;
-			}else if((!e.visible||arg=='refresh') && e.t < se.b && e.b > se.t && e.visibleFn){
-				if(!e.once)
-					$(window).on('scroll', {
-							delta:function(){return Math.round((se.b-se.events[j].t)/(se.wh+se.events[j].h)*100)/100 },
-							selector:e.selector
-						}, e.visibleFn)
-				else{
-					e.visibleFn();
-				}
-				e.visible=true;
 			}
 		}
 	}
