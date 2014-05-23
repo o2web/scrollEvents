@@ -1,5 +1,9 @@
 // scrollEvents.js
-// by ctibo
+// o2web.ca
+
+// Tous droits réservés
+// All rights reserved
+// 2014
 
 window.se = {
 		events:[],
