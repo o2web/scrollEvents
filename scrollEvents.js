@@ -28,23 +28,39 @@ window.se = {
 					$(window).off('scroll', eventScroller).off('resize',resizeScroller);
 					window.events = [];
 				}
-				else if(args=='update'){
-					resizeScroller();
+				else if(args=='trigger'){
 					eventScroller('update');
 				}
-				else if(args=='disable' || args=='enable'){
+				else if(args=='resize'){
+					resizeScroller();
+				}
+				else if(args=='update'){
+					resizeScroller(eventScroller('update'));
+				}
+				else if(args=='disable' || args=='enable' || args=='remove'){
 					var elements = $(this);
+					var removed = [];
 					for(var i=0; i<window.se.events.length; i++){
 						var e = window.se.events[i];
 						for(var j=0; j<elements.length; j++){
 							var element = elements[j];
 							if(e.selector[0] == element){
-								e.disabled = args=='disable';
+								if(args=='remove'){
+									removed.push(i);
+								}else{
+									e.disabled = args=='disable';
+								}
 							}
 						}
 					}
+					if(args=='remove'){
+						var ev = window.se.events;
+						for(var k=0;k<removed.length; k++){
+							ev.splice(removed[k],1);
+						}
+					}
 				}
-				return;
+				return this;
 			}
 			
 			$(this).each(function(k,v){	
@@ -80,7 +96,7 @@ window.se = {
 			var e = se.events[i];
 			if(!e.disabled){
 				if((e.visible||arg=='update') && e.b <= se.t){
-					if(!e.once){
+					if(!e.once&&arg!='update'){
 						$(window).off('scroll', e.visibleFn);
 					}
 					if(e.upFn && typeof(e.upFn)=='function'){
@@ -88,7 +104,7 @@ window.se = {
 					}
 					e.visible=false;
 				}else if((e.visible||arg=='update') && e.t >= se.b){
-					if(!e.once){
+					if(!e.once&&arg!='update'){
 						$(window).off('scroll', e.visibleFn);
 					}
 					if(e.downFn && typeof(e.downFn)=='function'){
@@ -104,8 +120,9 @@ window.se = {
 								index: e.i,
 								height: e.h
 							}, e.visibleFn);
-					}else{
-						e.visibleFn();
+					}
+					if(e.once||arg=='update'){
+						e.visibleFn(e);
 					}
 					e.visible=true;
 				}
@@ -115,7 +132,7 @@ window.se = {
 
 	var resizeTimeout;
 	
-	function resizeScroller(){
+	function resizeScroller(e){
 		clearTimeout(resizeTimeout);
 		resizeTimeout = setTimeout(function(){
 			var se = window.se;
@@ -133,10 +150,9 @@ window.se = {
 				e.b = e.t+e.h;
 			}
 		},300);
+		if(typeof(e)=='function') e();
 	}
 
-	resizeScroller();
-	window.scroll(0,1);
-	
+	resizeScroller();	
 
 })(jQuery);
