@@ -5,14 +5,13 @@
 // All rights reserved
 // 2014
 
-window.se = {
+(function($){
+	window.se = {
 		events:[],
 		t:$(window).scrollTop(),
 		b:$(window).height(),
 		wh:$(window).height()
 	};
-
-(function($){
 
 	Function.prototype.clone = function() {
 	    var that = this;
