@@ -77,9 +77,12 @@
 						visibleFn: false,
 						upFn:null,
 						downFn:null,
+						topUpFn: false,
+						topDownFn: false,
 						once:true,
 						offset:0,
 						visible:false,
+						topVisible: false,
 						h:$(this).outerHeight(),
 						t:0,
 						b:$(this).outerHeight(),
@@ -108,30 +111,35 @@
 		for(var i=0; i<se.events.length; i++){
 			var e = se.events[i];
 			if(!e.disabled){
+				// IF UP
 				if((e.visible||arg=='update') && e.b <= se.t){
 					e.visible=false;
 					if(!e.once){
-						$(window).off('scroll', e.visibleFn);
+						container.off('scroll', e.visibleFn);
 					}
 					if(e.upFn && typeof(e.upFn)=='function'){
-						e.upFn();
+						e.upFn(e);
 					}
 					
-				}else if((e.visible||arg=='update') && e.t >= se.b){
+				}
+				// IF DOWN
+				else if((e.visible||arg=='update') && e.t >= se.b){
 					e.visible=false;
 					if(!e.once&&arg!='update'){
-						$(window).off('scroll', e.visibleFn);
+						container.off('scroll', e.visibleFn);
 					}
 					if(e.downFn && typeof(e.downFn)=='function'){
-						e.downFn();
+						e.downFn(e);
 					}
 					
-				}else if((!e.visible||arg=='update') && e.t < se.b && e.b > se.t && e.visibleFn){
+				}
+				// IF VISIBLE
+				else if((!e.visible||arg=='update') && e.t < se.b && e.b > se.t && e.visibleFn){
 					e.visible=true;
 					if(!e.once){
 						var j = i+0;
-						$(window).on('scroll', {
-								delta: function(){return Math.round( ( se.t - (se.events[j].t - se.wh) ) / ( se.events[j].h + se.wh) *100)/100 },
+						container.on('scroll', {
+								delta: function(){return Math.round( ( se.t - (se.events[j].t - se.h) ) / ( se.events[j].h + se.h) *100)/100 },
 								selector: e.selector,
 								index: e.i,
 								height: e.h
@@ -139,7 +147,7 @@
 
 						if(arg=='update') e.visibleFn({
 							data:{
-								delta: function(){return Math.round( ( se.t - (se.events[j].t - se.wh) ) / ( se.events[j].h + se.wh) *100)/100 },
+								delta: function(){return Math.round( ( se.t - (se.events[j].t - se.h) ) / ( se.events[j].h + se.h) *100)/100 },
 								selector: e.selector,
 								index: e.i,
 								height: e.h
@@ -150,7 +158,16 @@
 					if(e.once){
 						e.visibleFn(e);
 					}
-					
+				}
+				// IF topUP
+				if((e.topUpFn && typeof(e.topUpFn)=='function') && (e.topVisible||arg=='update') && e.t <= se.t){
+					e.topVisible = false;
+					e.topUpFn(e);
+				}
+				// IF topDOWN
+				else if((e.topDownFn && typeof(e.topDownFn)=='function') && (!e.topVisible||arg=='update') && e.t > se.t){
+					e.topVisible = true;
+					e.topDownFn(e);
 				}
 			}
 		}
@@ -167,7 +184,7 @@
 			e.h =  $(o).outerHeight();
 			var tmp = $(o)[0].style.display;
 			$(o)[0].style.display = 'initial';
-			e.t = $(o).offset().top - e.offset;
+			e.t = Math.round($(o).offset().top - e.offset);
 			$(o)[0].style.display = tmp;
 			if($(o).attr('style')== '') $(this).removeAttr('style');
 			e.b = e.t+e.h;
