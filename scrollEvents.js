@@ -26,7 +26,7 @@
 	};
 
 	$.extend($.fn, {
-		scrollEvents :function(args){
+		scrollEvents :function(args, option){
 			if(typeof(args)=='string'){
 
 				if(args=='destroy'){
@@ -48,20 +48,29 @@
 					for(var i=0; i<selection.length; i++){
 						var it = selection[i];
 						if(it.ev){
-							var ev = it.ev;
 							if(args=='remove'){
 								removed.push(it);
-							}else{
-								ev.disabled = args=='disable';
+							}
+							else{
+								for(var j=0;j<it.ev.length;j++){
+									var ev = it.ev[j];
+									if(option){
+										if(ev.flag==option) ev.disabled = (args=='disable');
+									}
+									else{
+										ev.disabled = (args=='disable');
+									}
+									
+								}
 							}
 						}
 					}
 					if(args=='remove'){
-						removed.sort(function(a, b){return b-a});
+						removed.sort(function(a, b){return b.ev.se-a.ev.se});
 						for(var k=0;k<removed.length; k++){
-							var e = e.ev;
+							var e = removed[k];
 							if(e.ev && !e.ev.once) $(window).off('scroll', e.ev.visibleFn);
-							se.items.splice(removed[k],1);
+							se.items.splice(e.ev.se,1);
 						}
 						for(var i=0; i<se.items.length; i++){
 							se.items[i].ev.se = i;
@@ -74,6 +83,7 @@
 			$(this).each(function(k,v){	
 				var e = $.extend(true,{
 						selector: $(this),
+						flag: false,
 						visibleFn: false,
 						upFn:false,
 						downFn:false,
