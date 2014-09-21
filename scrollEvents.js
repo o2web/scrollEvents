@@ -26,9 +26,8 @@
 	};
 
 	$.extend($.fn, {
-		scrollEvents :function(args, option){
+		scrollEvents :function(args, flag, options){
 			if(typeof(args)=='string'){
-
 				if(args=='destroy'){
 					$(window).off('scroll', eventScroller).off('resize',resizeScroller);
 					window.items = [];
@@ -42,7 +41,7 @@
 				else if(args=='update'){
 					resizeScroller(eventScroller);
 				}
-				else if(args=='disable' || args=='enable' || args=='remove'){
+				else if(args=='disable' || args=='enable' || args=='remove' || args=='set'){
 					var selection = $(this);
 					var removed = [];
 					for(var i=0; i<selection.length; i++){
@@ -54,11 +53,17 @@
 							else{
 								for(var j=0;j<it.ev.length;j++){
 									var ev = it.ev[j];
-									if(option){
-										if(ev.flag==option) ev.disabled = (args=='disable');
+									if(flag && typeof(flag=='string')){
+
+										if(ev.flag==flag){
+											if(args=='disable'||args=='enable') ev.disabled = (args=='disable')
+											else if(args=='set') $.extend(true, ev, options);
+
+										}
 									}
 									else{
-										ev.disabled = (args=='disable');
+										if(args=='disable'||args=='enable') ev.disabled = (args=='disable')
+										else if(args=='set') $.extend(true, ev, flag);
 									}
 									
 								}
@@ -82,24 +87,25 @@
 			
 			$(this).each(function(k,v){	
 				var e = $.extend(true,{
-						selector: $(this),
+						selection: $(this),
 						flag: false,
-						visibleFn: false,
-						upFn:false,
-						downFn:false,
-						topUpFn: false,
-						topDownFn: false,
+						visible: false,
+						up:false,
+						down:false,
+						topOut: false,
+						topIn: false,
 						once:true,
 						offset:0,
-						visible:false,
-						topVisible: false,
+						isVisible:false,
+						topIsVisible: false,
+						container: $(window),
 						h:$(this).outerHeight(),
 						t:0,
 						b:$(this).outerHeight(),
 						i: k,
 						disabled: false
 					}, args);
-				e.visibleFn = e.visibleFn ? args.visibleFn.clone() : function(){};
+				e.visible = e.visible ? args.visible.clone() : function(){};
 				
 				var duplicate = false;
 				for(var i=0; i<se.items.length; i++ ){
@@ -110,6 +116,10 @@
 				if(!duplicate){
 					se.items.push(this);
 					e.se = se.items.length;
+					this.initialStates = {
+					 	position: $(this).css('position'),
+					 	top: parseInt($(this).css('top').replace(['px', '%'], ''))
+					};
 				}				
 				if(!this.ev){
 					this.ev = [];
@@ -130,68 +140,67 @@
 		se.b = se.t+se.wh;
 		for(var i=0; i<se.items.length; i++){
 			var it = se.items[i];
-			for(var j=0; j<it.ev.length; j++){
-				var e = it.ev[j];
+			for(var j=0; j<it.ev.length; j++) (function(e){
 				if(!e.disabled){
 					// IF UP
-					if((e.visible||arg=='update') && e.b <= se.t){
-						e.visible=false;
+					if((e.isVisible||arg=='update') && e.b <= se.t){
+						e.isVisible=false;
 						if(!e.once){
-							container.off('scroll', e.visibleFn);
+							e.container.off('scroll', e.visible);
 						}
-						if(e.upFn){
-							e.upFn(e);
+						if(e.up){
+							e.up(e);
 						}
 					}
 					// IF DOWN
-					else if((e.visible||arg=='update') && e.t >= se.b){
-						e.visible=false;
+					else if((e.isVisible||arg=='update') && e.t >= se.b){
+						e.isVisible=false;
 						if(!e.once&&arg!='update'){
-							container.off('scroll', e.visibleFn);
+							e.container.off('scroll', e.visible);
 						}
-						if(e.downFn){
-							e.downFn(e);
+						if(e.down){
+							e.down(e);
 						}	
 					}
-					// IF VISIBLE
-					else if((!e.visible||arg=='update') && e.t < se.b && e.b > se.t && e.visibleFn){
-						e.visible=true;
+					// IF isVisible
+					else if((!e.isVisible||arg=='update') && e.t < se.b && e.b > se.t && e.visible){
+						e.isVisible=true;
 						if(!e.once){
-							var j = i+0;
-							container.on('scroll', {
-									delta: function(){return Math.round( ( se.t - (se.events[j].t - se.h) ) / ( se.events[j].h + se.h) *100)/100 },
-									selector: e.selector,
+							var k = i+0;
+							e.container.on('scroll', {
+									delta: function(){return Math.round( ( se.t - (e.t - se.wh) ) / ( e.h + se.wh) *100)/100 },
+									selection: e.selection,
 									index: e.i,
 									height: e.h
-								}, e.visibleFn);
+								}, e.visible);
 
-							if(arg=='update') e.visibleFn({
+							if(arg=='update') e.visible({
 								data:{
-									delta: function(){return Math.round( ( se.t - (se.events[j].t - se.h) ) / ( se.events[j].h + se.h) *100)/100 },
-									selector: e.selector,
+									delta: function(){return Math.round( ( se.t - (e.t - se.wh) ) / ( e.h + se.wh) *100)/100 },
+									selection: e.selection,
 									index: e.i,
 									height: e.h
 								},
-								visible: e.visible
+								isVisible: e.isVisible
 							});
 						}
 						if(e.once){
-							e.visibleFn(e);
+							e.visible(e);
 						}
 					}
-					// IF topUP
-					if(e.topUpFn && (e.topVisible||arg=='update') && e.t <= se.t){
-						e.topVisible = false;
-						e.topUpFn(e);
+					// IF topOut
+					if(e.topOut && (e.topIsVisible||arg=='update') && e.t <= se.t){
+						e.topIsVisible = false;
+						e.topOut(e);
 					}
-					// IF topDOWN
-					else if(e.topDownFn && (!e.topVisible||arg=='update') && e.t > se.t){
-						e.topVisible = true;
-						e.topDownFn(e);
+					// IF topIn
+					else if(e.topIn && (!e.topIsVisible||arg=='update') && e.t > se.t){
+						e.topIsVisible = true;
+						e.topIn(e);
 					}
 				}
-			}
-		}
+			})(it.ev[j]);
+		};
 	}
 
 	var resizeTimeout;
@@ -200,17 +209,18 @@
 		se.wh = $(window).height();
 		for(var i=0; i<se.items.length; i++){
 
-			var it = $(se.items[i]);
-
-			var h =  it.outerHeight();
-			var tmp = it[0].style.display;
-			it[0].style.display = 'initial';
-			var t = Math.round(it.offset().top);
-			it[0].style.display = tmp;
-			if(it.attr('style')== '') it.removeAttr('style');
-
-			for(var j=0; j<it[0].ev.length;j++){
-				var e = it[0].ev[j];
+			var $it = $(se.items[i]);
+			var it = $it[0];
+			var h =  $it.outerHeight();
+			var tmpPos = it.style.position;
+			var tmpTop = it.style.top;
+			it.style.position = it.initialStates.position;
+			it.style.top = it.initialStates.top;
+			var t = Math.round($it.offset().top);
+			it.style.position = tmpPos;
+			it.style.top = tmpTop;
+			for(var j=0; j<it.ev.length;j++){
+				var e = it.ev[j];
 				e.h = h;
 				e.t = t - e.offset;
 				e.b = e.t+e.h;
@@ -228,7 +238,8 @@
 				clearTimeout(resizeTimeout);
 				resizeTimeout = setTimeout(function(){
 					recalculate();
-					if(typeof(e)=='object'&&e.type=='resize') eventScroller('update');
+					$(window).trigger('hardResize');
+					// if(typeof(e)=='object'&&e.type=='resize') eventScroller('update');
 				},150);
 				
 			}

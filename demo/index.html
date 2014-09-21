@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">    
+<title>sticky.js</title>
+    <link rel="stylesheet" href="css/application.css">
+     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="../scrollEvents.js"></script>
+    <script src="../sticky.js"></script>
+    <script src="js/demo.js"></script>
+  </head>
+  <body>
+    <div class="wrapper">
+	  	
+    	<h1>scrollEvents.js + sticky.js</h1>
+
+	  	<section class="intro dark">
+
+	  		<div class="container">
+	  			<code>
+options = {
+	selection: $(this), 		<span>// Élément auquel sera associé l'événement</span>
+	flag: false,			<span>// Identifiant de l'événement</span>
+	visible: false,			<span>// Callback lorsque l'élément est visible</span>
+	up:false,			<span>// Callback lorsque l'élément sort de l'écran par le haut</span>
+	down:false,			<span>// Callback lorsque l'élément sort de l'écran par le bas</span>
+	topOut: false,			<span>// Callback lorsque le haut de l'élément sort par le haut de l'écran</span>
+	topIn: false,			<span>// Callback lorsque le haut de l'élément entre par le haut de l'écran</span>
+	once:true,				
+	offset:0,			<span>// Décallage par rapport à la position de l'élément</span>
+	isVisible:false,
+	topIsVisible: false,
+	disabled: false
+}
+
+$('.element').scrollEvents(options);
+	  			</code>
+
+	  		</div>
+	  	
+	  	</section>
+
+	  	<section class="demo-1 ">
+	  		<h2>1</h2>
+	  		<div class="message container translate left">
+	  			Down : Ajoute la classe <em>left</em><br/>
+	  			Visible : enlève les classes <em>left</em> et <em>right</em><br/>
+	  			UP : Ajoute la classe <em>right</em>
+	  		</div>
+	  	
+		  	<div class="container">
+		  		<code class="eval">
+$('.demo-1 .message').scrollEvents({
+	visible: function(e){
+		e.selection.removeClass('left right');
+	},
+	up: function(e){
+		e.selection.addClass('right');
+	},
+	down: function(e){
+		e.selection.addClass('left');
+	}
+});
+				</code>
+	  		</div>
+		</section>
+
+
+		<section class="demo-2 dark">
+	  		<h2>2</h2>
+	  		<div class="message container color">
+	  			Activation avec un <em>offset</em>
+	  		</div>
+	  	
+		  	<div class="container">
+		  		<code class="eval">
+$('.demo-2 .message').scrollEvents({
+	offset: 300,
+	topOut: function(e){
+		e.selection.addClass('light');
+	},
+	topIn: function(e){
+		e.selection.removeClass('light');
+	}
+});
+				</code>
+	  		</div>
+		</section>
+
+		<section class="demo-3">
+	  		<h2>3</h2>
+	  		<div class="message container">
+	  			Delta : <em>0</em>
+	  		</div>
+	  		<div class="overlay delta"></div>
+	  	
+		  	<div class="container">
+		  		<code class="eval">
+$('.demo-3 .message').scrollEvents({
+	once: false,
+	visible: function(e){
+		var delta = e.data.delta();
+		$('em', e.data.selection).html(delta);
+		$('.demo-3 .overlay').width((delta*100)+'%');
+	}
+});
+				</code>
+	  		</div>
+		</section>
+
+		<section class="demo-4 dark">
+	  		<h2>4</h2>
+	  		<div class="message sticky container">
+	  			<nav>
+	  				Sticky
+	  			</nav>
+	  		</div>
+	  		<div class="overlay delta"></div>
+	  	
+		  	<div class="container">
+		  		<code class="eval">
+$('.demo-4 nav').sticky({
+	offset: 50,
+	offsetBottom: 50,
+	sticked: function(e){
+		e.selection.removeClass('contained').addClass('sticked').html('Sticked');
+	},
+	contained: function(e){
+		e.selection.removeClass('sticked').addClass('contained').html('Contained');
+	},
+	reset: function(e){
+		e.selection.removeClass('sticked contained').html('Sticky');
+	}
+});
+				</code>
+	  		</div>
+		</section>
+
+		<section class="resize">
+	  		<h2>4</h2>
+	  		<div class="message container">
+	  			Déclencher le resize lors du $(window).load()
+	  		</div>
+	  		<div class="overlay delta"></div>
+	  	
+		  	<div class="container">
+		  		<code class="eval">
+$(window).on('load',function(){
+	$(this).scrollEvents('resize');
+});
+				</code>
+	  		</div>
+		</section>
+
+	 </div>
+  </body>
+</html>

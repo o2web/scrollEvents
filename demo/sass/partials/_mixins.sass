@@ -1,0 +1,97 @@
+// ==========================================================================
+//  MIXINS
+// ========================================================================== 
+
+// FONT-SIZE
+@mixin fsize($sizeValue)
+    $remValue: ($sizeValue / 16)
+    $pxValue: $sizeValue
+    font-size: $pxValue + px
+    font-size: $remValue + em
+
+// TRANSITIONS
+@mixin transition($transition, $time, $easing)
+    @if $transition != transform
+        -webkit-transition: $transition $time $easing
+        -moz-transition: $transition $time $easing
+        -ms-transition: $transition $time $easing
+        -o-transition: $transition $time $easing
+        transition: $transition $time $easing
+    @else
+        -webkit-transition: -webkit-transform $time $easing
+        -moz-transition: -moz-transform $time $easing
+        -ms-transition: -ms-transform $time $easing
+        -o-transition: -o-transform $time $easing
+        transition: transform $time $easing
+
+// TRANSFORMS
+@mixin transform($transform)
+    -webkit-transform: $transform
+    -moz-transform: $transform
+    -ms-transform: $transform
+    -o-transform: $transform
+    transform: $transform
+
+@function debug($var)
+    @return $var
+
+// PREFIXED PROPS
+// exemple :
+// @include prefix(transition, transform 300ms linear, opacity 300ms 200ms linear)
+
+@mixin prefix($prop, $values...)
+    $prefixes: -webkit-, -moz-, -ms-, -o-, null
+    @for $p from 1 through length($prefixes)
+        $results: ()
+        @for $i from 1 through length($values)
+            $val: nth($values, $i)
+            $res: ()
+            @for $k from 1 through length($val)
+                @if nth($val, $k) == transform
+                    $res: append($res, #{nth($prefixes, $p)}#{nth($val, $k)}, space)
+                @else 
+                    $res: append($res, #{nth($val, $k)}, space) 
+            $results: append($results, $res, comma)
+        #{nth($prefixes, $p)}#{$prop}: $results
+
+
+// CLEARFIX
+@mixin clearfix()
+    zoom: 1
+    &:before, &:after
+        content: "\0020" 
+        display: block 
+        height: 0 
+        overflow: hidden
+    &:after
+        clear: both
+
+// INLINE-BLOCK
+@mixin inlineb()
+    display: inline-block
+    *display: inline
+    zoom: 1
+
+// OPACITY
+@mixin opacity($n)
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity="+($n*100)+")"
+    filter: alpha(opacity=($n*100))
+    opacity: $n
+
+// COLUMNS
+@mixin columns($n, $gap)
+    -webkit-column-count: $n
+    -moz-column-count: $n
+    column-count: $n
+    @if $gap
+        -webkit-column-gap: $gap
+        -moz-column-gap: $gap
+        column-gap: $gap
+
+// IE : Équivalent ie8 d'un :before
+@mixin ieBefore($content)
+    *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '#{$content}' + this.innerHTML)
+
+// IE : Équivalent ie8 d'un :after
+@mixin ieAfter($content)
+    *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = this.innerHTML + '#{$content}')
