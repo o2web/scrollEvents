@@ -28,6 +28,7 @@
 	};
 
 
+
 	function checkUp(e, activate, callback){
 		if(e.isVisible && e.b <= se.t){
 			if(activate) e.isVisible=false;
@@ -80,6 +81,56 @@
 		}
 	}
 
+	//
+	function parseChecks(e){
+		e.checks = [];
+
+		if(e.travel){
+			e.checks.push(
+				{	
+					fn: checkTravel,
+					activate: true,
+					callback: !!e.travel
+				}
+			)
+		}
+		if(e.up || e.checkdown || e.visible){
+			e.checks.push(
+				{	
+					fn: checkUp,
+					activate: true,
+					callback: !!e.up
+				},
+				{
+					fn: checkDown,
+					activate: true,
+					callback: !!e.down
+				},
+				{
+					fn: checkVisible,
+					activate: true,
+					callback: !!e.visible
+				}
+
+			)
+		}
+		if(e.topOut || e.topIn){
+			e.checks.push(
+				{	
+					fn: checkTopOut,
+					activate: true,
+					callback: !!e.topOut
+				},
+				{
+					fn: checkTopIn,
+					activate: true,
+					callback: !!e.topIn
+				}
+			)
+		}
+	}
+
+
 
 	$.extend($.fn, {
 		scrollEvents :function(args, flag, options){
@@ -112,14 +163,34 @@
 									if(flag && typeof(flag=='string')){
 
 										if(ev.flag==flag){
-											if(args=='disable'||args=='enable') ev.disabled = (args=='disable')
+											if(args=='disable'){
+												ev.disabled = true;
+												if(e.travel) e.container.off('scroll', e.travel);
+											}
+											else if(args=='enable'){
+												ev.disabled = false;
+												if(e.travel){
+													e.isVisible = false;
+													checkTravel(ev, true, true);
+												}
+											}
 											else if(args=='set') $.extend(true, ev, options);
 
 										}
 									}
 									else{
-										if(args=='disable'||args=='enable') ev.disabled = (args=='disable')
-										else if(args=='set') $.extend(true, ev, flag);
+										if(args=='disable'){
+											ev.disabled = true;
+											if(ev.travel) ev.container.off('scroll', ev.travel);
+										}
+										else if(args=='enable'){
+											ev.disabled = false;
+											if(ev.travel){
+												ev.isVisible = false;
+												checkTravel(ev, true, true);
+											}
+										}
+										else if(args=='set') $.extend(true, ev, options);
 									}
 									
 								}
@@ -166,52 +237,8 @@
 					}, args);
 				e.travel = e.travel ? args.travel.clone() : false;
 				
-				//
-				// PUSH CHECKS
-				if(e.travel){
-					e.checks.push(
-						{	
-							fn: checkTravel,
-							activate: true,
-							callback: !!e.travel
-						}
-					)
-				}
-				if(e.up || e.checkdown || e.visible){
-					e.checks.push(
-						{	
-							fn: checkUp,
-							activate: true,
-							callback: !!e.up
-						},
-						{
-							fn: checkDown,
-							activate: true,
-							callback: !!e.down
-						},
-						{
-							fn: checkVisible,
-							activate: true,
-							callback: !!e.visible
-						}
-
-					)
-				}
-				if(e.topOut || e.topIn){
-					e.checks.push(
-						{	
-							fn: checkTopOut,
-							activate: true,
-							callback: !!e.topOut
-						},
-						{
-							fn: checkTopIn,
-							activate: true,
-							callback: !!e.topIn
-						}
-					)
-				}
-				
+				parseChecks(e);
+					
 				//
 				//
 				var duplicate = false;

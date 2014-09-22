@@ -3,7 +3,7 @@
   <head>
   	<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">    
-<title>sticky.js</title>
+<title>scrollEvents.js</title>
     <link rel="stylesheet" href="css/application.css">
      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="../scrollEvents.min.js"></script>
@@ -13,14 +13,21 @@
   <body>
     <div class="wrapper">
 	  	
-    	<h1>scrollEvents.js + sticky.js</h1>
+    	<h1><span class="blue">scrollEvents.js</span> + <span class="turquoise">sticky.js</span></h1>
 
 	  	<section class="intro dark">
 
 	  		<div class="container">
 	  			<code>
+// UTILISATION
+
+$('.element').scrollEvents(options);
+
+$('.element').scrollEvents(method [, flag], options);
+
+// OPTIONS
 options = {
-	selection: $(this), 		<span>// Élément auquel sera associé l'événement</span>
+	selection: $(this), 		<span>// Éléments auxquels sera associé l'événement</span>
 	flag: false,			<span>// Identifiant de l'événement</span>
 	offset: 0,			<span>// Décallage par rapport à la position de l'élément</span>
 	//
@@ -36,7 +43,20 @@ options = {
 	disabled: false
 }
 
-$('.element').scrollEvents(options);
+// METHODS
+methods = [
+	'trigger',			<span>// Déclenche l'analyse des événements</span>
+	//
+	'resize',			<span>// Récupère les tailles et offsets de tous les éléments</span>
+	'update',			<span>// Comme le Resize, et met à jour les propriétés «isVisible»</span>
+	//
+	'set',				<span>// Modifie un paramètre</span>
+	//
+	'enable',			<span>// Active un événement</span>
+	'disable',			<span>// Désactive un événement</span>
+	'remove',			<span>// Supprime un événement</span>
+	'destroy'			<span>// Destroy scrollEvents</span>
+]
 	  			</code>
 
 	  		</div>
@@ -134,22 +154,55 @@ $('.demo-4 nav').sticky({
 	  		</div>
 		</section>
 
-		<section class="resize">
-	  		<h2>4</h2>
-	  		<div class="message container">
-	  			Déclencher le resize lors du $(window).load()
-	  		</div>
-	  		<div class="overlay delta"></div>
+	
+		<section class="demo-5">
+	  		<h2>5</h2>
+	  		
+	  		<div class="dino"></div>
 	  	
 		  	<div class="container">
 		  		<code class="eval">
-$(window).on('load',function(){
-	setTimeout(function(){
-		$(this).scrollEvents('update');
-	}, 200);
-	
+$('.demo-5').scrollEvents({
+	travel: function(e){
+		var dino = $('.demo-5 .dino')[0];
+		var delta = e.data.delta();
+		dino.style.left = ((delta*200)-50)+'%';
+		dino.style.backgroundPosition = '0px ' + ((delta*200)%10*-150) +'px';
+	}
+});
+
+$('.demo-5 button').on('click', function(){
+	var active = $(this).toggleClass('active').hasClass('active');
+	$('.demo-5').scrollEvents( active ? 'disable' : 'enable' );
+});
+
+$('.demo-5 button').sticky({
+	offset: 50,
+	offsetBottom: 250,
+	sticked: function(e){
+		e.selection.removeClass('contained').addClass('sticked');
+	},
+	contained: function(e){
+		e.selection.removeClass('sticked').addClass('contained');
+	},
+	reset: function(e){
+		e.selection.removeClass('sticked contained');
+	}
 });
 				</code>
+	  		</div>
+
+  			<button>
+  				<span class="idle">Désactiver</span>
+					<span class="hover">Activer</span>
+  			</button>
+
+		</section>
+
+
+		<section class="enjoy dark">
+	  		<div class="message container">
+	  			Enjoy
 	  		</div>
 		</section>
 
