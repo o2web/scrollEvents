@@ -32,7 +32,7 @@
 				offset:  -options.container.outerHeight() + $el.outerHeight() + options.offsetBottom + options.offset + options.offset ,
 				topIn: options.sticked,
 				topOut: options.contained,
-				topIsVisible: true
+				// topIsVisible: true
 			})
 			
 			function updateOptions(){

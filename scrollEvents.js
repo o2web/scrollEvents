@@ -7,11 +7,13 @@
 // 2014
 
 (function($){
+	$win = $(window);
+
 	window.se = {
 		items: [],
-		t:$(window).scrollTop(),
-		b:$(window).height(),
-		wh:$(window).height()
+		t:$win.scrollTop(),
+		b:$win.height(),
+		wh:$win.height()
 	};
 
 	Function.prototype.clone = function() {
@@ -25,11 +27,65 @@
 	    return temp;
 	};
 
+
+	function checkUp(e, activate, callback){
+		if(e.isVisible && e.b <= se.t){
+			if(activate) e.isVisible=false;
+			if(callback) e.up(e);
+		}
+	}
+	function checkDown(e, activate, callback){
+		if(e.isVisible && e.t >= se.b){
+			if(activate) e.isVisible=false;
+			if(callback) e.down(e);
+		}
+	}
+	function checkVisible(e, activate, callback){
+		if(!e.isVisible && e.t < se.b && e.b > se.t){
+			if(activate) e.isVisible=true;
+			if(callback) e.visible(e);
+		}
+	}
+	function checkTopOut(e, activate, callback){
+		if(e.topIsVisible && e.t <= se.t){
+			if(activate) e.topIsVisible = false;
+			if(callback) e.topOut(e);
+		}
+	}
+	function checkTopIn(e, activate, callback){
+		if(!e.topIsVisible && e.t > se.t){
+			if(activate) e.topIsVisible = true;
+			if(callback) e.topIn(e);
+		}
+	}
+	function checkTravel(e, activate, callback){
+		if(e.isVisible && e.b <= se.t){
+			if(activate&&!e.up) e.isVisible=false;
+			if(callback) e.container.off('scroll', e.travel);
+		}
+		if(e.isVisible && e.t >= se.b){
+			if(activate&&!e.down) e.isVisible=false;
+			if(callback) e.container.off('scroll', e.travel);
+		}
+		if(!e.isVisible && e.t < se.b && e.b > se.t){
+			if(activate&&!e.visible) e.isVisible=true;
+			if(callback){
+				e.container.on('scroll', {
+					delta: function(){return Math.round( ( se.t - (e.t - se.wh) ) / ( e.h + se.wh) *100)/100 },
+					selection: e.selection,
+					index: e.i,
+					height: e.h
+				}, e.travel);
+			}
+		}
+	}
+
+
 	$.extend($.fn, {
 		scrollEvents :function(args, flag, options){
 			if(typeof(args)=='string'){
 				if(args=='destroy'){
-					$(window).off('scroll', eventScroller).off('resize',resizeScroller);
+					$win.off('scroll', eventScroller).off('resize',resizeScroller);
 					window.items = [];
 				}
 				else if(args=='resize'){
@@ -39,7 +95,7 @@
 					eventScroller('update');
 				}
 				else if(args=='update'){
-					resizeScroller(eventScroller);
+					resizeScroller('update');
 				}
 				else if(args=='disable' || args=='enable' || args=='remove' || args=='set'){
 					var selection = $(this);
@@ -74,7 +130,7 @@
 						removed.sort(function(a, b){return b.ev.se-a.ev.se});
 						for(var k=0;k<removed.length; k++){
 							var e = removed[k];
-							if(e.ev && !e.ev.once) $(window).off('scroll', e.ev.visibleFn);
+							if(e.ev && !e.ev.once) $win.off('scroll', e.ev.visibleFn);
 							se.items.splice(e.ev.se,1);
 						}
 						for(var i=0; i<se.items.length; i++){
@@ -89,24 +145,75 @@
 				var e = $.extend(true,{
 						selection: $(this),
 						flag: false,
+						//
 						visible: false,
 						up:false,
 						down:false,
 						topOut: false,
 						topIn: false,
-						once:true,
+						travel: false,
+						//
 						offset:0,
 						isVisible:false,
 						topIsVisible: false,
-						container: $(window),
+						container: $win,
 						h:$(this).outerHeight(),
 						t:0,
 						b:$(this).outerHeight(),
 						i: k,
-						disabled: false
+						disabled: false,
+						checks: []
 					}, args);
-				e.visible = e.visible ? args.visible.clone() : function(){};
+				e.travel = e.travel ? args.travel.clone() : false;
 				
+				//
+				// PUSH CHECKS
+				if(e.travel){
+					e.checks.push(
+						{	
+							fn: checkTravel,
+							activate: true,
+							callback: !!e.travel
+						}
+					)
+				}
+				if(e.up || e.checkdown || e.visible){
+					e.checks.push(
+						{	
+							fn: checkUp,
+							activate: true,
+							callback: !!e.up
+						},
+						{
+							fn: checkDown,
+							activate: true,
+							callback: !!e.down
+						},
+						{
+							fn: checkVisible,
+							activate: true,
+							callback: !!e.visible
+						}
+
+					)
+				}
+				if(e.topOut || e.topIn){
+					e.checks.push(
+						{	
+							fn: checkTopOut,
+							activate: true,
+							callback: !!e.topOut
+						},
+						{
+							fn: checkTopIn,
+							activate: true,
+							callback: !!e.topIn
+						}
+					)
+				}
+				
+				//
+				//
 				var duplicate = false;
 				for(var i=0; i<se.items.length; i++ ){
 					if(se.items[i]==this){
@@ -118,85 +225,52 @@
 					e.se = se.items.length;
 					this.initialStates = {
 					 	position: $(this).css('position'),
-					 	top: parseInt($(this).css('top').replace(['px', '%'], ''))
+					 	top: $(this).css('top')
 					};
-				}				
+				}
 				if(!this.ev){
 					this.ev = [];
 				}
-				this.ev.push(e);	
+				this.ev.push(e);
+
 				
 			});
 
-			$(window).off('scroll', eventScroller).off('resize',resizeScroller);
-			$(window).on('scroll', eventScroller).on('resize',resizeScroller);
+			$win.off('scroll', eventScroller).off('resize',resizeScroller);
+			$win.on('scroll', eventScroller).on('resize',resizeScroller);
 			
 			return this;
 		}			
 	});
 
-	function eventScroller(arg){
-		se.t = $(window).scrollTop();
+	
+
+	function eventScroller(){
+		se.t = $win.scrollTop();
 		se.b = se.t+se.wh;
 		for(var i=0; i<se.items.length; i++){
 			var it = se.items[i];
 			for(var j=0; j<it.ev.length; j++) (function(e){
 				if(!e.disabled){
-					// IF UP
-					if((e.isVisible||arg=='update') && e.b <= se.t){
-						e.isVisible=false;
-						if(!e.once){
-							e.container.off('scroll', e.visible);
-						}
-						if(e.up){
-							e.up(e);
-						}
+					for(var k=0; k<e.checks.length; k++){
+						var c = e.checks[k];
+						c.fn(e, c.activate, c.callback);
 					}
-					// IF DOWN
-					else if((e.isVisible||arg=='update') && e.t >= se.b){
-						e.isVisible=false;
-						if(!e.once&&arg!='update'){
-							e.container.off('scroll', e.visible);
-						}
-						if(e.down){
-							e.down(e);
-						}	
-					}
-					// IF isVisible
-					else if((!e.isVisible||arg=='update') && e.t < se.b && e.b > se.t && e.visible){
-						e.isVisible=true;
-						if(!e.once){
-							var k = i+0;
-							e.container.on('scroll', {
-									delta: function(){return Math.round( ( se.t - (e.t - se.wh) ) / ( e.h + se.wh) *100)/100 },
-									selection: e.selection,
-									index: e.i,
-									height: e.h
-								}, e.visible);
+				}
+			})(it.ev[j]);
+		};
+	}
 
-							if(arg=='update') e.visible({
-								data:{
-									delta: function(){return Math.round( ( se.t - (e.t - se.wh) ) / ( e.h + se.wh) *100)/100 },
-									selection: e.selection,
-									index: e.i,
-									height: e.h
-								},
-								isVisible: e.isVisible
-							});
-						}
-						if(e.once){
-							e.visible(e);
-						}
-					}
-					// IF topOut
-					if(e.topOut && (e.topIsVisible||arg=='update') && e.t <= se.t){
-						e.topIsVisible = false;
-						e.topOut(e);
-					}
-					// IF topIn
-					else if(e.topIn && (!e.topIsVisible||arg=='update') && e.t > se.t){
-						e.topIsVisible = true;
-						e.topIn(e);
+	function updateScroller(){
+		se.t = $win.scrollTop();
+		se.b = se.t+se.wh;
+		for(var i=0; i<se.items.length; i++){
+			var it = se.items[i];
+			for(var j=0; j<it.ev.length; j++) (function(e){
+				if(!e.disabled){
+					for(var k=0; k<e.checks.length; k++){
+						var c = e.checks[k];
+						c.fn(e, c.activate, false);
 					}
 				}
 			})(it.ev[j]);
@@ -206,7 +280,7 @@
 	var resizeTimeout;
 
 	function recalculate(){
-		se.wh = $(window).height();
+		se.wh = $win.height();
 		for(var i=0; i<se.items.length; i++){
 
 			var $it = $(se.items[i]);
@@ -229,16 +303,16 @@
 		}
 	}
 
-	function resizeScroller(e){
-			if(typeof(e)=='function'){
+	function resizeScroller(arg){
+			if(arg=='update'){
 				recalculate();
-				e('update');
+				updateScroller();
 			}
 			else{
 				clearTimeout(resizeTimeout);
 				resizeTimeout = setTimeout(function(){
 					recalculate();
-					$(window).trigger('hardResize');
+					$win.trigger('hardResize');
 					// if(typeof(e)=='object'&&e.type=='resize') eventScroller('update');
 				},150);
 				

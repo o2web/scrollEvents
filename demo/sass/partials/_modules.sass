@@ -50,18 +50,15 @@ code
 		@include prefix(transition, transform 2400ms $ease)
 		@include prefix(transform, translate3d(0,0,0))
 		&.left
-			@include prefix(transform, translate3d(-300px, 0, 0))
-		&.right
-			@include prefix(transform, translate3d(300px, 0, 0))
-
+			@include prefix(transform, translate3d(-800px, 0, 0))
 
 	&.color
-		@include prefix(transition, border 300ms $ease)
+		@include prefix(transition, border 300ms $ease, color 300ms $ease)
 		em
 			@include prefix(transition, color 300ms $ease)
-			color: $blue
-		&.light
+		&.turquoise
 			border: 4px solid $turquoise
+			color: $turquoise
 			em
 				color: $turquoise
 	

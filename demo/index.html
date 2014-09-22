@@ -22,13 +22,15 @@
 options = {
 	selection: $(this), 		<span>// Élément auquel sera associé l'événement</span>
 	flag: false,			<span>// Identifiant de l'événement</span>
-	visible: false,			<span>// Callback lorsque l'élément est visible</span>
+	offset: 0,			<span>// Décallage par rapport à la position de l'élément</span>
+	//
+	visible: false,			<span>// Callback lorsque l'élément entre dans l'écran</span>
 	up:false,			<span>// Callback lorsque l'élément sort de l'écran par le haut</span>
 	down:false,			<span>// Callback lorsque l'élément sort de l'écran par le bas</span>
 	topOut: false,			<span>// Callback lorsque le haut de l'élément sort par le haut de l'écran</span>
 	topIn: false,			<span>// Callback lorsque le haut de l'élément entre par le haut de l'écran</span>
-	once:true,				
-	offset:0,			<span>// Décallage par rapport à la position de l'élément</span>
+	travel: false,			<span>// Callback qui se déclenche à chaque «scroll» où l'événement est visible</span>
+	//
 	isVisible:false,
 	topIsVisible: false,
 	disabled: false
@@ -44,19 +46,15 @@ $('.element').scrollEvents(options);
 	  	<section class="demo-1 ">
 	  		<h2>1</h2>
 	  		<div class="message container translate left">
-	  			Down : Ajoute la classe <em>left</em><br/>
-	  			Visible : enlève les classes <em>left</em> et <em>right</em><br/>
-	  			UP : Ajoute la classe <em>right</em>
+	  			Visible : Retire la classe <em>left</em><br/>
+	  			Down : Ajoute la classe <em>left</em>
 	  		</div>
 	  	
 		  	<div class="container">
 		  		<code class="eval">
 $('.demo-1 .message').scrollEvents({
 	visible: function(e){
-		e.selection.removeClass('left right');
-	},
-	up: function(e){
-		e.selection.addClass('right');
+		e.selection.removeClass('left');
 	},
 	down: function(e){
 		e.selection.addClass('left');
@@ -78,10 +76,10 @@ $('.demo-1 .message').scrollEvents({
 $('.demo-2 .message').scrollEvents({
 	offset: 300,
 	topOut: function(e){
-		e.selection.addClass('light');
+		e.selection.addClass('turquoise');
 	},
 	topIn: function(e){
-		e.selection.removeClass('light');
+		e.selection.removeClass('turquoise');
 	}
 });
 				</code>
@@ -98,8 +96,7 @@ $('.demo-2 .message').scrollEvents({
 		  	<div class="container">
 		  		<code class="eval">
 $('.demo-3 .message').scrollEvents({
-	once: false,
-	visible: function(e){
+	travel: function(e){
 		var delta = e.data.delta();
 		$('em', e.data.selection).html(delta);
 		$('.demo-3 .overlay').width((delta*100)+'%');
@@ -147,7 +144,10 @@ $('.demo-4 nav').sticky({
 		  	<div class="container">
 		  		<code class="eval">
 $(window).on('load',function(){
-	$(this).scrollEvents('resize');
+	setTimeout(function(){
+		$(this).scrollEvents('update');
+	}, 200);
+	
 });
 				</code>
 	  		</div>
