@@ -6,52 +6,52 @@
 <title>scrollEvents.js</title>
     <link rel="stylesheet" href="css/application.css">
      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="../scrollEvents.min.js"></script>
-    <script src="../sticky.min.js"></script>
+    <script src="../scrollEvents.js"></script>
+    <script src="../sticky.js"></script>
     <script src="js/demo.js"></script>
   </head>
   <body>
     <div class="wrapper">
 	  	
-    	<h1><span class="blue">scrollEvents.js</span> + <span class="turquoise">sticky.js</span></h1>
+    	<h1><span class="blue">scrollEvents.js</span> <small>&amp;</small> <span class="turquoise">sticky.js</span></h1>
 
 	  	<section class="intro dark">
 
 	  		<div class="container">
 	  			<code>
-// UTILISATION
+<span>// UTILISATION</span>
 
 $('.element').scrollEvents(options);
 
 $('.element').scrollEvents(method [, flag], options);
 
-// OPTIONS
+<span>// OPTIONS</span>
 options = {
 	selection: $(this), 		<span>// Éléments auxquels sera associé l'événement</span>
 	flag: false,			<span>// Identifiant de l'événement</span>
 	offset: 0,			<span>// Décallage par rapport à la position de l'élément</span>
-	//
+	<span>//</span>
 	visible: false,			<span>// Callback lorsque l'élément entre dans l'écran</span>
 	up:false,			<span>// Callback lorsque l'élément sort de l'écran par le haut</span>
 	down:false,			<span>// Callback lorsque l'élément sort de l'écran par le bas</span>
 	topOut: false,			<span>// Callback lorsque le haut de l'élément sort par le haut de l'écran</span>
 	topIn: false,			<span>// Callback lorsque le haut de l'élément entre par le haut de l'écran</span>
 	travel: false,			<span>// Callback qui se déclenche à chaque «scroll» où l'événement est visible</span>
-	//
+	<span>//</span>
 	isVisible:false,
 	topIsVisible: false,
 	disabled: false
 }
 
-// METHODS
+<span>// METHODS</span>
 methods = [
 	'trigger',			<span>// Déclenche l'analyse des événements</span>
-	//
+	<span>//</span>
 	'resize',			<span>// Récupère les tailles et offsets de tous les éléments</span>
 	'update',			<span>// Comme le Resize, et met à jour les propriétés «isVisible»</span>
-	//
+	<span>//</span>
 	'set',				<span>// Modifie un paramètre</span>
-	//
+	<span>//</span>
 	'enable',			<span>// Active un événement</span>
 	'disable',			<span>// Désactive un événement</span>
 	'remove',			<span>// Supprime un événement</span>
@@ -176,9 +176,10 @@ $('.demo-5 button').on('click', function(){
 	$('.demo-5').scrollEvents( active ? 'disable' : 'enable' );
 });
 
+
 $('.demo-5 button').sticky({
 	offset: 50,
-	offsetBottom: 250,
+	offsetBottom: 50,
 	sticked: function(e){
 		e.selection.removeClass('contained').addClass('sticked');
 	},
@@ -198,6 +199,21 @@ $('.demo-5 button').sticky({
   			</button>
 
 		</section>
+
+		<section class="schema">	  		
+	  	
+		  	<div class="message container">
+		  		<div class="blue">$(window).on('scroll')</div>
+	  			<img src="img/schema-loop.jpg" />
+	  		</div>
+
+	  		<div class="message container">
+	  			<div class="blue">$(window).on('resize')</div>
+	  			<img src="img/schema-resize.jpg" />
+	  		</div>
+
+		</section>
+
 
 
 		<section class="enjoy dark">

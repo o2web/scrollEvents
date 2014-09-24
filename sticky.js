@@ -27,17 +27,17 @@
 				topOut: options.sticked
 			});
 
-			$el.scrollEvents({
+			options.container.scrollEvents({
+				selection: $el,
 				flag: 'contained',
-				offset:  -options.container.outerHeight() + $el.outerHeight() + options.offsetBottom + options.offset + options.offset ,
+				offset:  -options.container.outerHeight() + $el.outerHeight() + options.offsetBottom + options.offset ,
 				topIn: options.sticked,
-				topOut: options.contained,
-				// topIsVisible: true
+				topOut: options.contained
 			})
 			
 			function updateOptions(){
 				$el.scrollEvents('set','contained', {
-					offset: -options.container.outerHeight() + $el.outerHeight() + options.offsetBottom + options.offset + options.offset
+					offset: -options.container.outerHeight() + $el.outerHeight() + options.offsetBottom + options.offset
 				});
 			}
 

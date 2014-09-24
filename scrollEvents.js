@@ -165,11 +165,11 @@
 										if(ev.flag==flag){
 											if(args=='disable'){
 												ev.disabled = true;
-												if(e.travel) e.container.off('scroll', e.travel);
+												if(ev.travel) e.container.off('scroll', ev.travel);
 											}
 											else if(args=='enable'){
 												ev.disabled = false;
-												if(e.travel){
+												if(ev.travel){
 													e.isVisible = false;
 													checkTravel(ev, true, true);
 												}
@@ -216,6 +216,7 @@
 				var e = $.extend(true,{
 						selection: $(this),
 						flag: false,
+						offset:0,
 						//
 						visible: false,
 						up:false,
@@ -224,7 +225,7 @@
 						topIn: false,
 						travel: false,
 						//
-						offset:0,
+						
 						isVisible:false,
 						topIsVisible: false,
 						container: $win,
@@ -259,7 +260,7 @@
 					this.ev = [];
 				}
 				this.ev.push(e);
-
+				console.log(this);
 				
 			});
 
