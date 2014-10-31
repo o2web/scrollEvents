@@ -133,83 +133,10 @@
 
 
 	$.extend($.fn, {
-		scrollEvents :function(args, flag, options){
+		scrollEvents: function(args, flag, options){
+		
 			if(typeof(args)=='string'){
-				if(args=='destroy'){
-					$win.off('scroll', eventScroller).off('resize',resizeScroller);
-					window.items = [];
-				}
-				else if(args=='resize'){
-					resizeScroller();
-				}
-				else if(args=='trigger'){
-					eventScroller('update');
-				}
-				else if(args=='update'){
-					resizeScroller('update');
-				}
-				else if(args=='disable' || args=='enable' || args=='remove' || args=='set'){
-					var selection = $(this);
-					var removed = [];
-					for(var i=0; i<selection.length; i++){
-						var it = selection[i];
-						if(it.ev){
-							if(args=='remove'){
-								removed.push(it);
-							}
-							else{
-								for(var j=0;j<it.ev.length;j++){
-									var ev = it.ev[j];
-									if(flag && typeof(flag=='string')){
-
-										if(ev.flag==flag){
-											if(args=='disable'){
-												ev.disabled = true;
-												if(ev.travel) e.container.off('scroll', ev.travel);
-											}
-											else if(args=='enable'){
-												ev.disabled = false;
-												if(ev.travel){
-													e.isVisible = false;
-													checkTravel(ev, true, true);
-												}
-											}
-											else if(args=='set') $.extend(true, ev, options);
-
-										}
-									}
-									else{
-										if(args=='disable'){
-											ev.disabled = true;
-											if(ev.travel) ev.container.off('scroll', ev.travel);
-										}
-										else if(args=='enable'){
-											ev.disabled = false;
-											if(ev.travel){
-												ev.isVisible = false;
-												checkTravel(ev, true, true);
-											}
-										}
-										else if(args=='set') $.extend(true, ev, options);
-									}
-									
-								}
-							}
-						}
-					}
-					if(args=='remove'){
-						removed.sort(function(a, b){return b.ev.se-a.ev.se});
-						for(var k=0;k<removed.length; k++){
-							var e = removed[k];
-							if(e.ev && !e.ev.once) $win.off('scroll', e.ev.visibleFn);
-							se.items.splice(e.ev.se,1);
-						}
-						for(var i=0; i<se.items.length; i++){
-							se.items[i].ev.se = i;
-						}
-					}
-				}
-				return this;
+				return parseMethods(this, args, flag, options);
 			}
 			
 			$(this).each(function(k,v){	
@@ -259,14 +186,11 @@
 				if(!this.ev){
 					this.ev = [];
 				}
-				this.ev.push(e);
-				console.log(this);
-				
+				this.ev.push(e);				
 			});
 
 			$win.off('scroll', eventScroller).off('resize',resizeScroller);
 			$win.on('scroll', eventScroller).on('resize',resizeScroller);
-			
 			return this;
 		}			
 	});
@@ -345,6 +269,108 @@
 				},150);
 				
 			}
+	}
+
+
+	function parseMethods(selection, args, flag, options){
+		if(args=='destroy'){
+			$win.off('scroll', eventScroller).off('resize',resizeScroller);
+			window.items = [];
+		}
+		else if(args=='resize'){
+			resizeScroller();
+		}
+		else if(args=='trigger'){
+			eventScroller('update');
+		}
+		else if(args=='update'){
+			resizeScroller('update');
+		}
+		else if(args=='disable' || args=='enable' || args=='remove' || args=='set' || args=='eval'){
+			var selection = $(selection);
+			var removed = [];
+			for(var i=0; i<selection.length; i++){
+				var it = selection[i];
+				if(it.ev){
+					if(args=='remove'){
+						removed.push(it);
+					}
+					else{
+						for(var j=0;j<it.ev.length;j++){
+							var ev = it.ev[j];
+							if(args=='eval'){
+
+								var o = options && typeof(options=='string') ? options : flag;
+								var f = options && typeof(options=='string') ? flag : false;
+								
+								if(ev[o] && (!f || (f && f==ev.flag))){
+									if(o=='travel'){
+										return {
+											data: {
+													delta: function(){return Math.round( ( se.t - (ev.t - se.wh) ) / ( ev.h + se.wh) *100)/100 },
+													selection: ev.selection,
+													index: ev.i,
+													height: ev.h
+												}
+										}
+									}
+									else{
+										return ev[o](ev);
+									}
+								}
+							}
+							else{
+
+								if(flag && typeof(flag=='string')){
+
+									if(ev.flag==flag){
+										if(args=='disable'){
+											ev.disabled = true;
+											if(ev.travel) e.container.off('scroll', ev.travel);
+										}
+										else if(args=='enable'){
+											ev.disabled = false;
+											if(ev.travel){
+												e.isVisible = false;
+												checkTravel(ev, true, true);
+											}
+										}
+										else if(args=='set') $.extend(true, ev, options);
+
+									}
+								}
+								else{
+									if(args=='disable'){
+										ev.disabled = true;
+										if(ev.travel) ev.container.off('scroll', ev.travel);
+									}
+									else if(args=='enable'){
+										ev.disabled = false;
+										if(ev.travel){
+											ev.isVisible = false;
+											checkTravel(ev, true, true);
+										}
+									}
+									else if(args=='set') $.extend(true, ev, options);
+								}
+							}
+						}
+					}
+				}
+			}
+			if(args=='remove'){
+				removed.sort(function(a, b){return b.ev.se-a.ev.se});
+				for(var k=0;k<removed.length; k++){
+					var e = removed[k];
+					if(e.ev && !e.ev.once) $win.off('scroll', e.ev.visibleFn);
+					se.items.splice(e.ev.se,1);
+				}
+				for(var i=0; i<se.items.length; i++){
+					se.items[i].ev.se = i;
+				}
+			}
+		}
+		return selection;
 	}
 
 	resizeScroller();	
