@@ -6,6 +6,12 @@
 // All rights reserved
 // 2014
 
+function minMax(n,min,max){
+	if(n<min) return min;
+	if(n>max) return max;
+	return n;
+}
+
 (function($){
 	$win = $(window);
 
@@ -26,8 +32,6 @@
 	    }
 	    return temp;
 	};
-
-
 
 	function checkUp(e, activate, callback){
 		if(e.isVisible && e.b <= se.t){
@@ -59,7 +63,7 @@
 			if(callback) e.topIn(e);
 		}
 	}
-	function checkTravel(e, activate, callback){
+	function checkTravel(e, activate, callback, update){
 		if(e.isVisible && e.b <= se.t){
 			if(activate&&!e.up) e.isVisible=false;
 			if(callback) e.container.off('scroll', e.travel);
@@ -68,11 +72,11 @@
 			if(activate&&!e.down) e.isVisible=false;
 			if(callback) e.container.off('scroll', e.travel);
 		}
-		if(!e.isVisible && e.t < se.b && e.b > se.t){
+		if((update || !e.isVisible) && e.t < se.b && e.b > se.t){
 			if(activate&&!e.visible) e.isVisible=true;
-			if(callback){
+			if(callback || update){
 				e.container.on('scroll', {
-					delta: function(){return Math.round( ( se.t - (e.t - se.wh) ) / ( e.h + se.wh) *100)/100 },
+					delta: function(){return minMax(Math.round( ( se.t - (e.t - se.wh) ) / ( e.h + se.wh) *100)/100, 0, 1) },
 					selection: e.selection,
 					index: e.i,
 					height: e.h
@@ -222,11 +226,12 @@
 				if(!e.disabled){
 					for(var k=0; k<e.checks.length; k++){
 						var c = e.checks[k];
-						c.fn(e, c.activate, false);
+						c.fn(e, c.activate, false, true);
 					}
 				}
 			})(it.ev[j]);
 		};
+		$win.trigger('scroll');
 	}
 
 	var resizeTimeout;
