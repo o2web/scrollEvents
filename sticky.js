@@ -39,8 +39,8 @@
 				$el.scrollEvents({
 					flag: 'sticked',
 					offset: options.offset,
-					topIn: options.reset,
-					topOut: options.sticked
+					topDown: options.reset,
+					topUp: options.sticked
 				});
 				// CONTAINED
 				if(options.container){
@@ -48,8 +48,8 @@
 						selection: $el,
 						flag: 'contained',
 						offset:  -options.container.outerHeight() + $el.outerHeight() + options.offsetBottom + options.offset ,
-						topIn: options.sticked,
-						topOut: options.contained
+						topDown: options.sticked,
+						topUp: options.contained
 					})
 				}
 

@@ -142,6 +142,7 @@ $('.demo-3 .message').scrollEvents({
 $('.demo-4 nav').sticky({
 	offset: 50,
 	offsetBottom: 50,
+	container: $('.demo-4 .sticky.container'),
 	sticked: function(e){
 		e.selection.removeClass('contained').addClass('sticked').html('Sticked');
 	},
