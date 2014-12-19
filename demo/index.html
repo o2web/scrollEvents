@@ -31,11 +31,13 @@ options = {
 	flag: false,			<span>// Identifiant de l'événement</span>
 	offset: 0,			<span>// Décallage par rapport à la position de l'élément</span>
 	<span>//</span>
-	visible: false,			<span>// Callback lorsque l'élément entre dans l'écran</span>
+	visible: false,			<span>// Callback lorsque l'élément entre dans l'écran, par le haut ou par le bas</span>
 	up:false,			<span>// Callback lorsque l'élément sort de l'écran par le haut</span>
 	down:false,			<span>// Callback lorsque l'élément sort de l'écran par le bas</span>
-	topOut: false,			<span>// Callback lorsque le haut de l'élément sort par le haut de l'écran</span>
-	topIn: false,			<span>// Callback lorsque le haut de l'élément entre par le haut de l'écran</span>
+	topUp: false,			<span>// Callback lorsque le haut de l'élément sort par le haut de l'écran</span>
+	topDown: false,			<span>// Callback lorsque le haut de l'élément entre par le haut de l'écran</span>
+	bottomUp: false,	 	<span>// Callback lorsque le bas de l'élément entre par le bas de l'écran</span>
+	bottomDown: false,		<span>// Callback lorsque le bas de l'élément sort par le bas de l'écran</span>
 	travel: false,			<span>// Callback qui se déclenche à chaque «scroll» où l'événement est visible</span>
 	<span>//</span>
 	isVisible:false,
@@ -95,10 +97,10 @@ $('.demo-1 .message').scrollEvents({
 		  		<code class="eval">
 $('.demo-2 .message').scrollEvents({
 	offset: 300,
-	topOut: function(e){
+	topUp: function(e){
 		e.selection.addClass('turquoise');
 	},
-	topIn: function(e){
+	topDown: function(e){
 		e.selection.removeClass('turquoise');
 	}
 });
