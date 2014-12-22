@@ -60,9 +60,16 @@
 
 				function updateOptions(){
 					if(options.container){
+						var el = $el;
+						var tmpPos = el.style.position;
+						var tmpTop = el.style.top;
+						el.style.position = el.initialStates.position;
+						el.style.top = el.initialStates.top;
 						$el.scrollEvents('set','contained', {
 							offset: -(options.container.outerHeight() - $el.position().top - $el.outerHeight() - options.offsetBottom ) + options.offset,
 						});
+						el.style.position = tmpPos;
+						el.style.top = tmpTop;
 					}
 				}
 				$(window).on('hardResize', updateOptions);

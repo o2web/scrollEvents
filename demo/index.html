@@ -184,14 +184,14 @@ $('.demo-5 button').sticky({
 	offset: 50,
 	offsetBottom: 50,
 	container: $('.demo-5'),
-	sticked: function(e){
+	reset: function(e){
+		e.selection.removeClass('sticked contained');
+	},
+	fixed: function(e){
 		e.selection.removeClass('contained').addClass('sticked');
 	},
 	contained: function(e){
 		e.selection.removeClass('sticked').addClass('contained');
-	},
-	reset: function(e){
-		e.selection.removeClass('sticked contained');
 	}
 });
 				</code>
