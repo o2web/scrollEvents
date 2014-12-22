@@ -8,10 +8,5 @@ jQuery(document).ready(function($){
 		eval($(codes[i]).html());
 	}
 
-	$(window).on('load',function(){
-		setTimeout(function(){
-			$(this).scrollEvents('update');
-		}, 200);
-	});
 
 });

@@ -276,6 +276,20 @@ code {
         bottom: 50px;
         top: auto;
         color: #125EFF; }
+  .message.inverted nav {
+    position: relative;
+    background: #fff;
+    color: #125EFF;
+    padding: 25px;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto; }
+    .message.inverted nav.fixed {
+      position: fixed;
+      top: 0; }
+      .message.inverted nav.fixed.bottom {
+        top: auto;
+        bottom: 0; }
 
 .overlay {
   position: absolute;
