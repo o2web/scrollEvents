@@ -14,7 +14,7 @@ function minMax(n,min,max){
 
 (function($){
 	$win = $(window);
-  
+
 
 	window.se = {
 		items: [],
@@ -55,7 +55,7 @@ function minMax(n,min,max){
 	function checkVisible(e, activate, callback, update){
 		if(
 				( !e.isVisible && e.t < se.b && e.b > se.t ) ||
-				( update && e.t < se.b && e.b > se.t) 
+				( update && e.t < se.b && e.b > se.t)
 			){
 			if(activate) e.isVisible=true;
 			if(callback) e.visible(e);
@@ -72,7 +72,7 @@ function minMax(n,min,max){
 		}
 	}
 	function checkTopDown(e, activate, callback, update){
-		
+
 		if(
 				( !e.isTopVisible && e.t > se.t ) ||
 				( update && e.t > se.t )
@@ -83,7 +83,7 @@ function minMax(n,min,max){
 		}
 	}
 	function checkBottomUp(e, activate, callback, update){
-		
+
 		if(
 				( e.isBottomVisible && e.b < se.b ) ||
 				( update && e.b < se.b )
@@ -94,7 +94,7 @@ function minMax(n,min,max){
 		}
 	}
 	function checkBottomDown(e, activate, callback, update){
-		
+
 		if(
 				( !e.isBottomVisible && e.b >= se.b ) ||
 				( update && e.b >= se.b )
@@ -141,7 +141,7 @@ function minMax(n,min,max){
 
 		if(e.travel){
 			e.checks.push(
-				{	
+				{
 					fn: checkTravel,
 					activate: true,
 					callback: !!e.travel
@@ -150,7 +150,7 @@ function minMax(n,min,max){
 		}
 		if(e.up || e.checkdown || e.visible){
 			e.checks.push(
-				{	
+				{
 					fn: checkUp,
 					activate: true,
 					callback: !!e.up
@@ -170,7 +170,7 @@ function minMax(n,min,max){
 		}
 		if(e.topUp || e.topDown){
 			e.checks.push(
-				{	
+				{
 					fn: checkTopUp,
 					activate: true,
 					callback: !!e.topUp
@@ -184,7 +184,7 @@ function minMax(n,min,max){
 		}
 		if(e.bottomUp || e.bottomDown){
 			e.checks.push(
-				{	
+				{
 					fn: checkBottomUp,
 					activate: true,
 					callback: !!e.bottomUp
@@ -207,12 +207,12 @@ function minMax(n,min,max){
 
 	$.extend($.fn, {
 		scrollEvents: function(args, flag, options){
-		
+
 			if(typeof(args)=='string'){
 				return parseMethods(this, args, flag, options);
 			}
-			
-			$(this).each(function(k,v){	
+
+			$(this).each(function(k,v){
 				var e = $.extend(true,{
 						selection: $(this),
 						container: $win,
@@ -242,9 +242,9 @@ function minMax(n,min,max){
 						checks: []
 					}, args);
 				e.travel = e.travel ? args.travel.clone() : false;
-				
+
 				parseChecks(e);
-					
+
 				//
 				//
 				var duplicate = false;
@@ -264,17 +264,17 @@ function minMax(n,min,max){
 				if(!this.ev){
 					this.ev = [];
 				}
-				this.ev.push(e);	
+				this.ev.push(e);
 				this.ev.sort(sortEvents);
 			});
 
 			$win.off('scroll', eventScroller).off('resize',resizeScroller);
 			$win.on('scroll', eventScroller).on('resize',resizeScroller);
 			return this;
-		}			
+		}
 	});
 
-	
+
 
 	function eventScroller(){
 		se.t = $win.scrollTop();
@@ -329,7 +329,7 @@ function minMax(n,min,max){
 				e.t = t - e.offset;
 				e.b = e.t + e.h + e.offsetBottom;
 			}
-			
+
 		}
 	}
 
@@ -344,7 +344,7 @@ function minMax(n,min,max){
 					recalculate();
 					$win.trigger('hardResize');
 				},150);
-				
+
 			}
 	}
 
@@ -379,7 +379,7 @@ function minMax(n,min,max){
 
 								var o = options && typeof(options=='string') ? options : flag;
 								var f = options && typeof(options=='string') ? flag : false;
-								
+
 								if(ev[o] && (!f || (f && f==ev.flag))){
 									if(o=='travel'){
 										return {
@@ -451,9 +451,9 @@ function minMax(n,min,max){
 		return selection;
 	}
 
-	resizeScroller();	
+	resizeScroller();
 	$win.on('load', function(){
-		// console.log('update');
+		$win.scrollEvents('update');
 		resizeScroller('update');
 	});
 
