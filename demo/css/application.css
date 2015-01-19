@@ -225,6 +225,8 @@ code {
   .message em {
     color: #125EFF;
     font-style: normal; }
+    .message em.violet {
+      color: #9D267C; }
   .message.translate {
     -webkit-transition: -webkit-transform 2400ms cubic-bezier(0.4, 0, 0.16, 1);
     -moz-transition: -moz-transform 2400ms cubic-bezier(0.4, 0, 0.16, 1);
@@ -430,6 +432,60 @@ button {
     transform: rotateX(0deg); }
     button.active span.hover:after {
       background: transparent; }
+
+.demo-parallax .circles {
+  position: relative;
+  display: block;
+  padding-top: 200%;
+  font-size: 50px; }
+.demo-parallax .circle {
+  position: absolute;
+  font-size: 50px;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  -webkit-transform: translate3d(0, 0, 0);
+  -moz-transform: translate3d(0, 0, 0);
+  -ms-transform: translate3d(0, 0, 0);
+  -o-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1);
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%; }
+  .demo-parallax .circle.violet {
+    background: #9D267C; }
+  .demo-parallax .circle.blue {
+    background: #125EFF; }
+  .demo-parallax .circle.turquoise {
+    background: #00FFE0; }
+  .demo-parallax .circle[z="1"] {
+    width: 1em;
+    height: 1em;
+    margin: -0.5em;
+    z-index: 1; }
+  .demo-parallax .circle[z="2"] {
+    width: 2em;
+    height: 2em;
+    margin: -1em;
+    z-index: 2; }
+  .demo-parallax .circle[z="3"] {
+    width: 3em;
+    height: 3em;
+    margin: -1.5em;
+    z-index: 3; }
+  .demo-parallax .circle[z="4"] {
+    width: 4em;
+    height: 4em;
+    margin: -2em;
+    z-index: 4; }
+  .demo-parallax .circle[z="5"] {
+    width: 5em;
+    height: 5em;
+    margin: -2.5em;
+    z-index: 5; }
 
 input[type="submit"],
 input[type="text"],

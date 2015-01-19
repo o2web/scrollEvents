@@ -5,9 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
 <title>scrollEvents.js</title>
     <link rel="stylesheet" href="css/application.css">
+    <script src="js/modernizr.custom.js"></script>
      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="../scrollEvents.js"></script>
     <script src="../sticky.js"></script>
+    <script src="../parallax.js"></script>
     <script src="js/demo.js"></script>
   </head>
   <body>
@@ -238,17 +240,25 @@ $('.demo-5 button').sticky({
 	  		</div>
 		</section>
 
-		<section class="demo-7">
+		<section class="demo-parallax">
 	  		<h2>7</h2>
 	  		<div class="message container">
-	  			Effet <em>parallax</em>, avec scrollEvents&thinsp;!
+	  			Effet <em class="violet">parallax</em>, avec scrollEvents&thinsp;!
 	  		</div>
 	  		<div class="overlay delta"></div>
 
 		  	<div class="container">
 		  		<code class="eval">
 // Parallax
+$('.demo-parallax [z]').parallax();
+
+
 				</code>
+	  		</div>
+
+	  		<div class="container">
+	  			<ul class="circles">
+	  			</ul>
 	  		</div>
 		</section>
 
