@@ -433,59 +433,103 @@ button {
     button.active span.hover:after {
       background: transparent; }
 
-.demo-parallax .circles {
-  position: relative;
-  display: block;
-  padding-top: 200%;
-  font-size: 50px; }
-.demo-parallax .circle {
-  position: absolute;
-  font-size: 50px;
-  width: 1em;
-  height: 1em;
-  overflow: hidden;
-  -webkit-transform: translate3d(0, 0, 0);
-  -moz-transform: translate3d(0, 0, 0);
-  -ms-transform: translate3d(0, 0, 0);
-  -o-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  -webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1);
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  border-radius: 50%; }
-  .demo-parallax .circle.violet {
-    background: #9D267C; }
-  .demo-parallax .circle.blue {
-    background: #125EFF; }
-  .demo-parallax .circle.turquoise {
-    background: #00FFE0; }
-  .demo-parallax .circle[z="1"] {
+.demo-parallax {
+  background-attachment: fixed; }
+  .demo-parallax .circles {
+    display: block;
+    font-size: 50px;
+    margin-top: 50px;
+    position: relative;
+    z-index: 0; }
+    .demo-parallax .circles .container {
+      height: 2000px;
+      background: rgba(255, 255, 255, 0.5);
+      -webkit-transform: translate3d(0, 0, 0);
+      -moz-transform: translate3d(0, 0, 0);
+      -ms-transform: translate3d(0, 0, 0);
+      -o-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0); }
+  .demo-parallax .circle {
+    position: absolute;
+    font-size: 50px;
     width: 1em;
     height: 1em;
-    margin: -0.5em;
-    z-index: 1; }
-  .demo-parallax .circle[z="2"] {
-    width: 2em;
-    height: 2em;
-    margin: -1em;
-    z-index: 2; }
-  .demo-parallax .circle[z="3"] {
-    width: 3em;
-    height: 3em;
-    margin: -1.5em;
-    z-index: 3; }
-  .demo-parallax .circle[z="4"] {
-    width: 4em;
-    height: 4em;
-    margin: -2em;
-    z-index: 4; }
-  .demo-parallax .circle[z="5"] {
-    width: 5em;
-    height: 5em;
-    margin: -2.5em;
-    z-index: 5; }
+    overflow: hidden;
+    -webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1);
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    -webkit-transform: translate3d(0, 0, 0);
+    -moz-transform: translate3d(0, 0, 0);
+    -ms-transform: translate3d(0, 0, 0);
+    -o-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0); }
+    .demo-parallax .circle.violet {
+      background: #9d267c; }
+    .demo-parallax .circle.blue {
+      background: #125eff; }
+    .demo-parallax .circle.turquoise {
+      background: #00ffe0; }
+    .demo-parallax .circle[z="-5"] {
+      width: 0em;
+      height: 0em;
+      margin: -0em;
+      z-index: -5; }
+    .demo-parallax .circle[z="-4"] {
+      width: 0.5em;
+      height: 0.5em;
+      margin: -0.5em;
+      z-index: -4; }
+    .demo-parallax .circle[z="-3"] {
+      width: 1em;
+      height: 1em;
+      margin: -1em;
+      z-index: -3; }
+    .demo-parallax .circle[z="-2"] {
+      width: 1.5em;
+      height: 1.5em;
+      margin: -1.5em;
+      z-index: -2; }
+    .demo-parallax .circle[z="-1"] {
+      width: 2em;
+      height: 2em;
+      margin: -2em;
+      z-index: -1; }
+    .demo-parallax .circle[z="0"] {
+      width: 2.5em;
+      height: 2.5em;
+      margin: -2.5em;
+      z-index: 0;
+      -webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1);
+      -moz-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 0, 0, 0.1); }
+    .demo-parallax .circle[z="1"] {
+      width: 3em;
+      height: 3em;
+      margin: -3em;
+      z-index: 1; }
+    .demo-parallax .circle[z="2"] {
+      width: 3.5em;
+      height: 3.5em;
+      margin: -3.5em;
+      z-index: 2; }
+    .demo-parallax .circle[z="3"] {
+      width: 4em;
+      height: 4em;
+      margin: -4em;
+      z-index: 3; }
+    .demo-parallax .circle[z="4"] {
+      width: 4.5em;
+      height: 4.5em;
+      margin: -4.5em;
+      z-index: 4; }
+    .demo-parallax .circle[z="5"] {
+      width: 5em;
+      height: 5em;
+      margin: -5em;
+      z-index: 5; }
 
 input[type="submit"],
 input[type="text"],

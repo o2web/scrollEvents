@@ -22,22 +22,33 @@
   // jquery function
   $.fn.parallax = function(args, options){
     $selection = $(this);
+
+    // Pass methods directly to scrollevents
+    var type = typeof(args);
+    if(type == 'string'){ return $(this).scrollEvents(args, options) }
+
+    // set scrollEvents
     $selection.each(function(){
       var $el = $(this);
-      $el[0].z = parseFloat($el.attr('z'));
+      var el = $el[0];
+      el.z = parseFloat($el.attr('z'));
+      $el.scrollEvents({
+        flag: 'parallax',
+        offset: el.z ? (parallax.options.perspective * Math.abs(el.z)) : 0,
+        offsetBottom: el.z ? (parallax.options.perspective * Math.abs(el.z)) : 0,
+        travel: function(e){
+          var $el = e.data.selection;
+          var z = el.z;
+          var delta = z>0 ? 1 - e.data.delta() : e.data.delta();
+          var travel = (parallax.options.perspective* (z>0?z:-z) )
+          var y = Math.round( (delta*travel) - (travel/2));
 
-    }).scrollEvents({
-      flag: 'parallax',
-      travel: function(e){
-        var $el = e.data.selection;
-        var delta = 1 - e.data.delta();
-        var z = $el[0].z;
-        var travel = (parallax.options.perspective*z)
-        var y = delta*travel - (travel/2);
+          el.style[parallax.options.transform] = 'translate3d(0,'+y+'px, 0)';
+        }
+      });
 
-        $el[0].style[parallax.options.transform] = 'translate3d(0,'+y+'px, 0)';
-      }
-    });
+      return $selection;
+    })
   }
 
 

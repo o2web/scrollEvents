@@ -119,10 +119,10 @@ $('.demo-2 .message').scrollEvents({
 
 		  	<div class="container">
 		  		<code class="eval">
-$('.demo-3 .message').scrollEvents({
+$('.demo-3').scrollEvents({
 	travel: function(event){
 		var delta = event.data.delta();
-		$('em', event.data.selection).html(delta);
+		$('.message em', event.data.selection).html(delta);
 		$('.demo-3 .overlay').width((delta*100)+'%');
 	}
 });
@@ -256,10 +256,11 @@ $('.demo-parallax [z]').parallax();
 				</code>
 	  		</div>
 
-	  		<div class="container">
-	  			<ul class="circles">
-	  			</ul>
-	  		</div>
+  			<div class="circles">
+  				<div class="message container">
+  				</div>
+  			</div>
+
 		</section>
 
 		<section class="schema">

@@ -217,50 +217,68 @@ button
           background: rgba(0,0,0,0)
 
 
+
 // Parallax
+
+$circle-size: 50px
+
+=z-position($z)
+  $size: ($z+5)/2
+  width: #{$size}em
+  height: #{$size}em
+  margin: -#{$size}em
+  z-index: #{$z}
+
 .demo-parallax
+  background-attachment: fixed
   .circles
-    position: relative
     display: block
-    padding-top: 200%
-    font-size: 50px
+    font-size: $circle-size
+    margin-top: 50px
+    position: relative
+    z-index: 0
+    .container
+      height: 2000px
+      background: rgba(#fff,0.5)
+      +prefix(transform, translate3d(0,0,0))
   .circle
     position: absolute
     font-size: 50px
     width: 1em
     height: 1em
     overflow: hidden
-    +prefix(transform, translate3d(0,0,0))
     +box-shadow(0 2px 2px rgba(#000, 0.2), 0 0 10px rgba(#000,0.1))
     +border-radius(50%)
+    +prefix(transform, translate3d(0,0,0))
+    // +prefix(transition, transform 240ms ease)
     &.violet
-      background: $violet
+      background: rgba($violet, 1)
     &.blue
-      background: $blue
+      background: rgba($blue, 1)
     &.turquoise
-      background: $turquoise
+      background: rgba($turquoise, 1)
+    &[z="-5"]
+      +z-position(-5)
+    &[z="-4"]
+      +z-position(-4)
+    &[z="-3"]
+      +z-position(-3)
+    &[z="-2"]
+      +z-position(-2)
+    &[z="-1"]
+      +z-position(-1)
+    &[z="0"]
+      +z-position(0)
+      +box-shadow(0 2px 2px rgba(#000, 0.2), 0 0 10px rgba(#000,0.1))
     &[z="1"]
-      width: 1em
-      height: 1em
-      margin: -0.5em
-      z-index: 1
+      +z-position(1)
     &[z="2"]
-      width: 2em
-      height: 2em
-      margin: -1em
-      z-index: 2
+      +z-position(2)
     &[z="3"]
-      width: 3em
-      height: 3em
-      margin: -1.5em
-      z-index: 3
+      +z-position(3)
     &[z="4"]
-      width: 4em
-      height: 4em
-      margin: -2em
-      z-index: 4
+      +z-position(4)
     &[z="5"]
-      width: 5em
-      height: 5em
-      margin: -2.5em
-      z-index: 5
+      +z-position(5)
+
+

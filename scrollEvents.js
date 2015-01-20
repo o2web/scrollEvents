@@ -126,7 +126,7 @@ function minMax(n,min,max){
 			if(activate&&!e.visible) e.isVisible=true;
 			if(callback || update){
 				e.container.on('scroll', {
-					delta: function(){return minMax(Math.round( ( se.t - (e.t - se.wh) ) / ( e.h + se.wh) *100)/100, 0, 1) },
+					delta: function(){return minMax(Math.round( ( se.t - (e.t - se.wh) ) / ( e.h + e.offset + e.offsetBottom + se.wh) *100)/100, 0, 1) },
 					selection: e.selection,
 					index: e.i,
 					height: e.h
@@ -241,7 +241,7 @@ function minMax(n,min,max){
 						disabled: false,
 						checks: []
 					}, args);
-				e.travel = e.travel ? args.travel.clone() : false;
+				e.travel = args.travel ? args.travel.clone() : false;
 
 				parseChecks(e);
 
