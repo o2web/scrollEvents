@@ -2,18 +2,20 @@
 <html>
   <head>
   	<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">    
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
 <title>scrollEvents.js</title>
     <link rel="stylesheet" href="css/application.css">
+    <script src="js/modernizr.custom.js"></script>
      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="../scrollEvents.js"></script>
-    <script src="../sticky.js"></script>
+    <script src="../scrollEvents.min.js"></script>
+    <script src="../sticky.min.js"></script>
+    <script src="../parallax.min.js"></script>
     <script src="js/demo.js"></script>
   </head>
   <body>
     <div class="wrapper">
-	  	
-    	<h1><span class="blue">scrollEvents.js</span> <small>&amp;</small> <span class="turquoise">sticky.js</span></h1>
+
+    	<h1><span class="blue">scrollEvents.js</span> <small>+</small> <span class="turquoise">sticky.js</span> <small>+</small> <span class="violet">parallax.js</span></h1>
 
 	  	<section class="intro dark">
 
@@ -62,7 +64,7 @@ methods = [
 	  			</code>
 
 	  		</div>
-	  	
+
 	  	</section>
 
 	  	<section class="demo-1 ">
@@ -71,7 +73,7 @@ methods = [
 	  			Visible : Retire la classe <em>left</em><br/>
 	  			Down : Ajoute la classe <em>left</em>
 	  		</div>
-	  	
+
 		  	<div class="container">
 		  		<code class="eval">
 $('.demo-1 .message').scrollEvents({
@@ -92,7 +94,7 @@ $('.demo-1 .message').scrollEvents({
 	  		<div class="message container color">
 	  			Activation avec un <em>offset</em>
 	  		</div>
-	  	
+
 		  	<div class="container">
 		  		<code class="eval">
 $('.demo-2 .message').scrollEvents({
@@ -114,13 +116,13 @@ $('.demo-2 .message').scrollEvents({
 	  			Delta : <em>0</em>
 	  		</div>
 	  		<div class="overlay delta"></div>
-	  	
+
 		  	<div class="container">
 		  		<code class="eval">
-$('.demo-3 .message').scrollEvents({
+$('.demo-3').scrollEvents({
 	travel: function(event){
 		var delta = event.data.delta();
-		$('em', event.data.selection).html(delta);
+		$('.message em', event.data.selection).html(delta);
 		$('.demo-3 .overlay').width((delta*100)+'%');
 	}
 });
@@ -136,7 +138,7 @@ $('.demo-3 .message').scrollEvents({
 	  			</nav>
 	  		</div>
 	  		<div class="overlay delta"></div>
-	  	
+
 		  	<div class="container">
 		  		<code class="eval">
 $('.demo-4 nav').sticky({
@@ -157,14 +159,17 @@ $('.demo-4 nav').sticky({
 	  		</div>
 		</section>
 
-	
+
 		<section class="demo-5">
 	  		<h2>5</h2>
-	  		
+	  		<div class="message container">
+	  			Animation avec le callback <em>travel</em>
+	  		</div>
 	  		<div class="dino"></div>
-	  	
+
 		  	<div class="container">
 		  		<code class="eval">
+// Animation du background-position
 $('.demo-5').scrollEvents({
 	travel: function(e){
 		var dino = $('.demo-5 .dino')[0];
@@ -174,11 +179,12 @@ $('.demo-5').scrollEvents({
 	}
 });
 
+
+// Methodes enable & disable
 $('.demo-5 button').on('click', function(){
 	var active = $(this).toggleClass('active').hasClass('active');
 	$('.demo-5').scrollEvents( active ? 'disable' : 'enable' );
 });
-
 
 $('.demo-5 button').sticky({
 	offset: 50,
@@ -212,9 +218,11 @@ $('.demo-5 button').sticky({
 	  			</nav>
 	  		</div>
 	  		<div class="overlay delta"></div>
-	  	
+
 		  	<div class="container">
 		  		<code class="eval">
+// Désactivé dans le demo parce que ça met le message en position fixed quand on arrive sur la page.
+
 // $('.demo-6 nav').sticky({
 //	inverted: true,
 //	fixedTop: function(e){
@@ -232,8 +240,31 @@ $('.demo-5 button').sticky({
 	  		</div>
 		</section>
 
-		<section class="schema">	  		
-	  	
+		<section class="demo-parallax">
+	  		<h2>7</h2>
+	  		<div class="message container">
+	  			Effet <em class="violet">parallax</em>, avec scrollEvents&thinsp;!
+	  		</div>
+	  		<div class="overlay delta"></div>
+
+		  	<div class="container">
+		  		<code class="eval">
+// Parallax
+$('.demo-parallax [z]').parallax();
+
+
+				</code>
+	  		</div>
+
+  			<div class="circles">
+  				<div class="message container">
+  				</div>
+  			</div>
+
+		</section>
+
+		<section class="schema">
+
 		  	<div class="message container">
 		  		<div class="blue">$(window).on('scroll')</div>
 	  			<img src="img/schema-loop.jpg" />
