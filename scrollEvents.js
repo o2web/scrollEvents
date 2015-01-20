@@ -126,7 +126,7 @@ function minMax(n,min,max){
 			if(activate&&!e.visible) e.isVisible=true;
 			if(callback || update){
 				e.container.on('scroll', {
-					delta: function(){return minMax(Math.round( ( se.t - (e.t - se.wh) ) / ( e.h + e.offset + e.offsetBottom + se.wh) *100)/100, 0, 1) },
+					delta: function(){return minMax(Math.round( ( se.t - (e.t - se.wh) ) / ( e.h + e.offset + e.offsetBottom + se.wh) * e.round)/e.round, 0, 1) },
 					selection: e.selection,
 					index: e.i,
 					height: e.h
@@ -220,6 +220,7 @@ function minMax(n,min,max){
 						order: 0,
 						offset: 0,
 						offsetBottom: 0,
+						round: 100,
 						//
 						visible: false,
 						up: false,

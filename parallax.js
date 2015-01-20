@@ -34,14 +34,15 @@
       el.z = parseFloat($el.attr('z'));
       $el.scrollEvents({
         flag: 'parallax',
+        round: 1000,
         offset: el.z ? (parallax.options.perspective * Math.abs(el.z)) : 0,
         offsetBottom: el.z ? (parallax.options.perspective * Math.abs(el.z)) : 0,
         travel: function(e){
           var el = e.data.selection[0];
           var z = el.z;
           var delta = z>0 ? 1 - e.data.delta() : e.data.delta();
-          var travel = (parallax.options.perspective* (z>0?z:-z) )
-          var y = Math.round( (delta*travel) - (travel/2));
+          var travel = (parallax.options.perspective* Math.abs(z) )
+          var y = Math.round((delta*travel) - (travel/2));
 
           el.style[parallax.options.transform] = 'translate3d(0,'+y+'px, 0)';
         }
