@@ -228,9 +228,10 @@ $circle-size: 50px
   height: #{$size}em
   margin: -#{$size}em
   z-index: #{$z}
+  +box-shadow(0 #{($size*$size)/25}em #{($size*$size)/20}em rgba(#000, (1-(($size*$size)/100))/5 ))
 
 .demo-parallax
-  background-attachment: fixed
+  background: #fff
   .circles
     display: block
     font-size: $circle-size
@@ -239,7 +240,7 @@ $circle-size: 50px
     z-index: 0
     .container
       height: 2000px
-      background: rgba(#fff,0.5)
+      background: rgba(240,240,240,0.75)
       +prefix(transform, translate3d(0,0,0))
   .circle
     position: absolute
@@ -247,7 +248,6 @@ $circle-size: 50px
     width: 1em
     height: 1em
     overflow: hidden
-    +box-shadow(0 2px 2px rgba(#000, 0.2), 0 0 10px rgba(#000,0.1))
     +border-radius(50%)
     +prefix(transform, translate3d(0,0,0))
     // +prefix(transition, transform 240ms ease)
@@ -269,7 +269,7 @@ $circle-size: 50px
       +z-position(-1)
     &[z="0"]
       +z-position(0)
-      +box-shadow(0 2px 2px rgba(#000, 0.2), 0 0 10px rgba(#000,0.1))
+      z-index: 1
     &[z="1"]
       +z-position(1)
     &[z="2"]

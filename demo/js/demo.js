@@ -4,7 +4,7 @@ jQuery(document).ready(function($){
 
   // générer des cercles, parce que les placer à la main c'est trop long
   var $circles = $('.demo-parallax .circles');
-  var count = 50;
+  var count = 30;
   var colors = ['turquoise','blue','violet'];
   var zMin = -5;
   var zMax = 5;
