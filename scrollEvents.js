@@ -454,7 +454,6 @@ function minMax(n,min,max){
 
 	resizeScroller();
 	$win.on('load', function(){
-		$win.scrollEvents('update');
 		resizeScroller('update');
 	});
 
