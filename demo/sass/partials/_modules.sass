@@ -232,6 +232,10 @@ $circle-size: 50px
 
 .demo-parallax
   background: #fff
+  .container
+    position: relative
+    z-index: 0
+    +prefix(transform, translate3d(0,0,0))
   .circles
     display: block
     font-size: $circle-size
