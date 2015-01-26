@@ -11,7 +11,9 @@
 (function($){
 	$win = $(window);
 
-
+	//
+	//
+	// GLOBAL VARIABLES
 	window.se = {
 		selection: [],
 		t:$win.scrollTop(),
@@ -19,12 +21,11 @@
 		wh:$win.height()
 	};
 
-	function minMax(n,min,max){
-		if(n<min) return min;
-		if(n>max) return max;
-		return n;
-	}
+	//
+	//
+	// HELPERS
 
+	// clone functions
 	Function.prototype.clone = function() {
 	    var that = this;
 	    var temp = function temporary() { return that.apply(this, arguments); };
@@ -36,6 +37,38 @@
 	    return temp;
 	};
 
+	// min max
+	minMax = function(n,min,max){
+		if(n<min) return min;
+		if(n>max) return max;
+		return n;
+	}
+
+	// sort event by order option
+	sortEventsByOrder = function(a,b){
+		return 	a.order < b.order ? -1
+					: a.order > b.order ? 1
+					: 0
+	}
+
+	// sort events by closest to top
+	sortEventsByClosest = function(a,b){
+		var distA = a.topUp || a.topDown ?
+									Math.abs(se.t - a.t) :
+									Math.abs(se.b - a.b) ;
+		var distB = b.topUp || b.topDown ?
+									Math.abs(se.t - b.t) :
+									Math.abs(se.b - b.b) ;
+		console.log(distA + ' -------- ' + distB);
+		return 	distA < distB ? -1
+					: distA > distB ? 1
+					: 0
+	}
+
+
+	//
+	//
+	// CHECKS
 	function checkUp(e, activate, callback, update){
 		if(
 				( e.isVisible && e.b <= se.t ) ||
@@ -134,6 +167,8 @@
 	}
 
 	//
+	//
+	// PARSE WHICH CHECKS ARE NECESSARY
 	function parseChecks(e){
 		e.checks = [];
 
@@ -196,93 +231,16 @@
 		}
 	}
 
+
 	//
-	function sortEvents(a,b){
-		return 	a.order < b.order ? -1
-					: a.order > b.order ? 1
-					: 0
-	}
-
-	$.extend($.fn, {
-		scrollEvents: function(args, flag, options){
-
-			if(typeof(args)=='string'){
-				return parseMethods(this, args, flag, options);
-			}
-
-			$(this).each(function(k,v){
-				var e = $.extend(true,{
-						selection: $(this),
-						container: $win,
-						flag: false,
-						order: 0,
-						offset: 0,
-						offsetBottom: 0,
-						round: 100,
-						//
-						visible: false,
-						up: false,
-						down: false,
-						topUp: false,
-						topDown: false,
-						bottomUp: false,
-						bottomDown: false,
-						travel: false,
-						//
-						isVisible: false,
-						isTopVisible: false,
-						isBottomVisible: false,
-						//
-						h: $(this).outerHeight(),
-						t: 0,
-						b: $(this).outerHeight(),
-						i: k,
-						disabled: false,
-						checks: []
-					}, args);
-				e.travel = args.travel ? args.travel.clone() : false;
-
-				parseChecks(e);
-
-				//
-				//
-				var duplicate = false;
-				for(var i=0; i<se.selection.length; i++ ){
-					if(se.selection[i]==this){
-						duplicate = true;
-					}
-				}
-				if(!duplicate){
-					se.selection.push(this);
-					e.se = se.selection.length;
-					this.initialStates = {
-					 	position: $(this).css('position'),
-					 	top: $(this).css('top')
-					};
-				}
-				if(!this.ev){
-					this.ev = [];
-				}
-				this.ev.push(e);
-				this.ev.sort(sortEvents);
-			});
-
-			// un hook events, then rehook 'em
-			window.raf.off('scroll', eventScroller)
-				.on('scroll', eventScroller);
-			window.raf.off('afterdocumentresize', resizeScroller)
-				.on('afterdocumentresize', resizeScroller);
-			return this;
-		}
-	});
-
-
-
+	//
+	// FIRE EVENTS ON SCROLL
 	function eventScroller(){
 		se.t = $win.scrollTop();
 		se.b = se.t+se.wh;
 		for(var i=0; i<se.selection.length; i++){
 			var el = se.selection[i];
+			el.ev.sort(sortEventsByClosest);
 			for(var j=0; j<el.ev.length; j++) (function(e){
 				if(!e.disabled){
 					for(var k=0; k<e.checks.length; k++){
@@ -294,11 +252,15 @@
 		};
 	}
 
+	//
+	//
+	// FIRE EVENTS ON UPDATE
 	function updateScroller(){
 		se.t = $win.scrollTop();
 		se.b = se.t+se.wh;
 		for(var i=0; i<se.selection.length; i++){
 			var el = se.selection[i];
+			el.ev.sort(sortEventsByClosest);
 			for(var j=0; j<el.ev.length; j++) (function(e){
 				if(!e.disabled){
 					for(var k=0; k<e.checks.length; k++){
@@ -310,6 +272,9 @@
 		};
 	}
 
+	//
+	//
+	// RECALCULATE SIZES AND POSITIONS
 	function recalculate(){
 		se.wh = $win.height();
 		for(var i=0; i<se.selection.length; i++){
@@ -330,6 +295,9 @@
 		}
 	}
 
+	//
+	//
+	// RECALCULATE ON RESIZE
 	function resizeScroller(arg){
 			if(arg=='update'){
 				recalculate();
@@ -341,6 +309,9 @@
 	}
 
 
+	//
+	//
+	// METHODS AND WHAT TO DO WITH 'EM
 	function parseMethods(selection, args, flag, options){
 		if(args=='destroy'){
 			window.raf.off('scroll', eventScroller)
@@ -444,11 +415,88 @@
 		return selection;
 	}
 
+	//
+	//
+	// JQUERY FUNCTION
+	$.extend($.fn, {
+		scrollEvents: function(args, flag, options){
+
+			if(typeof(args)=='string'){
+				return parseMethods(this, args, flag, options);
+			}
+
+			$(this).each(function(k,v){
+				var e = $.extend(true,{
+						selection: $(this),
+						container: $win,
+						flag: false,
+						order: 0,
+						offset: 0,
+						offsetBottom: 0,
+						round: 100,
+						//
+						visible: false,
+						up: false,
+						down: false,
+						topUp: false,
+						topDown: false,
+						bottomUp: false,
+						bottomDown: false,
+						travel: false,
+						//
+						isVisible: false,
+						isTopVisible: false,
+						isBottomVisible: false,
+						//
+						h: $(this).outerHeight(),
+						t: 0,
+						b: $(this).outerHeight(),
+						i: k,
+						disabled: false,
+						checks: []
+					}, args);
+				e.travel = args.travel ? args.travel.clone() : false;
+
+				parseChecks(e);
+
+				//
+				//
+				var duplicate = false;
+				for(var i=0; i<se.selection.length; i++ ){
+					if(se.selection[i]==this){
+						duplicate = true;
+					}
+				}
+				if(!duplicate){
+					se.selection.push(this);
+					e.se = se.selection.length;
+					this.initialStates = {
+					 	position: $(this).css('position'),
+					 	top: $(this).css('top')
+					};
+				}
+				if(!this.ev){
+					this.ev = [];
+				}
+				this.ev.push(e);
+				this.ev.sort(sortEventsByOrder);
+			});
+
+			// un hook events, then rehook 'em
+			window.raf.off('scroll', eventScroller)
+				.on('scroll', eventScroller);
+			window.raf.off('afterdocumentresize', resizeScroller)
+				.on('afterdocumentresize', resizeScroller);
+			return this;
+		}
+	});
+
 	$(document).ready(function(){
 		window.raf.on('nextframe', function(){
 			resizeScroller('update');
 		});
 	})
+
 	// $win.on('load', function(){
 	// 	resizeScroller('update');
 	// });
