@@ -13,7 +13,7 @@
 
 
 	window.se = {
-		$selection: [],
+		selection: [],
 		t:$win.scrollTop(),
 		b:$win.height(),
 		wh:$win.height()
@@ -68,7 +68,6 @@
 				( e.isTopVisible && e.t <= se.t ) ||
 				( update && e.t <= se.t )
 		){
-			// console.log('top UP');
 			if(activate) e.isTopVisible = false;
 			if(callback) e.topUp(e);
 		}
@@ -79,7 +78,6 @@
 				( !e.isTopVisible && e.t > se.t ) ||
 				( update && e.t > se.t )
 		){
-			// console.log('top DOWN');
 			if(activate) e.isTopVisible = true;
 			if(callback) e.topDown(e);
 		}
@@ -90,7 +88,6 @@
 				( e.isBottomVisible && e.b < se.b ) ||
 				( update && e.b < se.b )
 		){
-			// console.log('bottom UP');
 			if(activate) e.isBottomVisible = false;
 			if(callback) e.bottomUp(e);
 		}
@@ -101,7 +98,6 @@
 				( !e.isBottomVisible && e.b >= se.b ) ||
 				( update && e.b >= se.b )
 		){
-			// console.log('bottom DOWN');
 			if(activate) e.isBottomVisible = true;
 			if(callback) e.bottomDown(e);
 		}
@@ -251,14 +247,14 @@
 				//
 				//
 				var duplicate = false;
-				for(var i=0; i<se.$selection.length; i++ ){
-					if(se.$selection[i]==this){
+				for(var i=0; i<se.selection.length; i++ ){
+					if(se.selection[i]==this){
 						duplicate = true;
 					}
 				}
 				if(!duplicate){
-					se.$selection.push(this);
-					e.se = se.$selection.length;
+					se.selection.push(this);
+					e.se = se.selection.length;
 					this.initialStates = {
 					 	position: $(this).css('position'),
 					 	top: $(this).css('top')
@@ -271,11 +267,11 @@
 				this.ev.sort(sortEvents);
 			});
 
-			// declare event if not already there
-			if(!window.raf.events.scroll)
-				window.raf.on('scroll', eventScroller);
-			if(!window.raf.events.resize)
-				window.raf.on('resize', resizeScroller);
+			// un hook events, then rehook 'em
+			window.raf.off('scroll', eventScroller)
+				.on('scroll', eventScroller);
+			window.raf.off('afterdocumentresize', resizeScroller)
+				.on('afterdocumentresize', resizeScroller);
 			return this;
 		}
 	});
@@ -285,8 +281,8 @@
 	function eventScroller(){
 		se.t = $win.scrollTop();
 		se.b = se.t+se.wh;
-		for(var i=0; i<se.$selection.length; i++){
-			var el = se.$selection[i];
+		for(var i=0; i<se.selection.length; i++){
+			var el = se.selection[i];
 			for(var j=0; j<el.ev.length; j++) (function(e){
 				if(!e.disabled){
 					for(var k=0; k<e.checks.length; k++){
@@ -301,8 +297,8 @@
 	function updateScroller(){
 		se.t = $win.scrollTop();
 		se.b = se.t+se.wh;
-		for(var i=0; i<se.$selection.length; i++){
-			var el = se.$selection[i];
+		for(var i=0; i<se.selection.length; i++){
+			var el = se.selection[i];
 			for(var j=0; j<el.ev.length; j++) (function(e){
 				if(!e.disabled){
 					for(var k=0; k<e.checks.length; k++){
@@ -316,8 +312,8 @@
 
 	function recalculate(){
 		se.wh = $win.height();
-		for(var i=0; i<se.$selection.length; i++){
-			var $el = $(se.$selection[i]);
+		for(var i=0; i<se.selection.length; i++){
+			var $el = $(se.selection[i]);
 			var el = $el[0];
 			var h =  $el.outerHeight();
 			el.style.position = el.initialStates.position;
@@ -348,8 +344,8 @@
 	function parseMethods(selection, args, flag, options){
 		if(args=='destroy'){
 			window.raf.off('scroll', eventScroller)
-			$win.off('resize',resizeScroller);
-			window.items = [];
+			window.raf.on('afterdocumentresize', resizeScroller);
+			window.se.selection = [];
 		}
 		else if(args=='resize'){
 			resizeScroller();
@@ -438,19 +434,23 @@
 				for(var k=0;k<removed.length; k++){
 					var e = removed[k];
 					if(e.ev && !e.ev.travel) window.raf.off(e.container, 'scroll', e.ev.visibleFn);
-					se.$selection.splice(e.ev.se,1);
+					se.selection.splice(e.ev.se,1);
 				}
-				for(var i=0; i<se.$selection.length; i++){
-					se.$selection[i].ev.se = i;
+				for(var i=0; i<se.selection.length; i++){
+					se.selection[i].ev.se = i;
 				}
 			}
 		}
 		return selection;
 	}
 
-	resizeScroller();
-	$win.on('load', function(){
-		resizeScroller('update');
-	});
+	$(document).ready(function(){
+		window.raf.on('nextframe', function(){
+			resizeScroller('update');
+		});
+	})
+	// $win.on('load', function(){
+	// 	resizeScroller('update');
+	// });
 
 })(jQuery);

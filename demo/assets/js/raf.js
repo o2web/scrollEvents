@@ -5,7 +5,7 @@
 (function($) {
 
   // jquery window
-  $win = $(window);
+  var $win = $(window);
 
   // RAF polyfill
   // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -59,12 +59,44 @@
     return array.splice(key, 1);
   }
 
+  // get dom element/prop combo
+  getDomPropCombo = function(elements, prefixes){
+    var test = 0;
+    var result = {
+      element: undefined,
+      prefix: undefined
+    }
+    for(var e=0; e<elements.length; e++)
+      for(var p=0; p<prefixes.length; p++)
+        if( prefixes[p]+'Height' in elements[e] && elements[e][prefixes[p]+'Height'] > test ){
+          test = elements[e][prefixes[p]+'Height'];
+          result = {
+            element: elements[e],
+            prefix: prefixes[p]
+          }
+        }
+    return result;
+  }
+
   // find hook inside an event's array
   findHook = function(hook, event){
     var key = -1;
     for(var i=0; i<event.length; i++)
       if(event[i].delegate == hook.delegate && event[i].callback == hook.callback) key = i;
     return key;
+  }
+
+  // trigger hooks for an event
+  triggerHooks = function(event, data){
+    if(!event) return false;
+    if(data && typeof data != 'object') data = false;
+    for(var e=0; e<event.length; e++){
+      var hook = event[e];
+      if(hook.callback){
+        if(data) hook = $.extend(data, hook);
+        hook.callback(hook);
+      }
+    }
   }
 
   // track pointer position on mouse/touch move
@@ -106,6 +138,8 @@
     //
     // SETUP
     var self = this;
+    var body = document.body;
+    var html = document.documentElement;
     // events holder
     this.events = [];
     // raf request
@@ -115,13 +149,28 @@
       top: window.pageYOffset,
       left: window.pageYOffset
     };
-    // resize data
-    this.resize = {
-      viewport: 'innerWidth' in window ? window : document.documentElement,
-      prefix: 'innerWidth' in window ? 'inner' : 'client',
-      width: 0,
-      height: 0,
-    }
+    // window data
+    this.win = $.extend(
+      getDomPropCombo(
+        [window, document.documentElement], // EX. element: document.body
+        ['inner', 'client'] // EX. prefix: 'inner'
+      ),
+      {
+        width: 0,
+        height: 0,
+      }
+    );
+    // document data
+    this.doc = $.extend(
+      getDomPropCombo(
+        [document.body, document.documentElement], // EX. element: document.body
+        ['inner', 'client'] // EX. prefix: 'inner'
+      ),
+      {
+        width: 0,
+        height: 0,
+      }
+    );
     // pointer data
     this.pointer = {x:0, y:0};
 
@@ -129,17 +178,25 @@
     //
     // init functions triggered for the first event of a kind
     this.inits = {
+      // init afterdocumentresize
+      afterdocumentresize: function(){
+        self.on('documentresize', $(self));
+      },
       // init pointermove
       pointermove: function(){
         // start tracking pointer position on window
         $win.on('mousemove touchmove', {self:self}, trackPointer);
-      }
+      },
     }
 
     //
     //
     // kill functions triggered when there's no more hooks for an event
     this.kills = {
+      // kill afterdocumentresize
+      afterdocumentresize: function(){
+        self.off('documentresize', $(self));
+      },
       // kill pointerpove
       pointermove: function(){
         // stop tracking pointer position on window
@@ -162,28 +219,44 @@
         // set new scroll positions
         self.scroll = current;
         // loop throught hooks on scroll event
-        for(var i=0; i<self.events.scroll.length; i++){
-          var hook = self.events.scroll[i];
-          hook.callback(hook);
-        }
+        triggerHooks(self.events.scroll);
       },
 
-      // detect if window size have changed
+      // detect if WINDOW size have changed
       resize: function(){
         var current = {
-          width: self.resize.viewport[self.resize.prefix+'Width'],
-          height: self.resize.viewport[self.resize.prefix+'Height']
+          width: self.win.element[self.win.prefix+'Width'],
+          height: self.win.element[self.win.prefix+'Height']
         }
         // exit if window size have not changed
-        if(current.width == self.resize.width && current.height == self.resize.height) return;
+        if(current.width == self.win.width && current.height == self.win.height) return;
         // set new window sizes
-        self.resize.width = current.width;
-        self.resize.height = current.height;
+        self.win.width = current.width;
+        self.win.height = current.height;
         // loop throught hooks on resize event
-        for(var i=0; i<self.events.resize.length; i++){
-          var hook = self.events.resize[i];
-          hook.callback(hook);
+        triggerHooks(self.events.resize);
+      },
+
+      // detect if DOCUMENT size have changed
+      documentresize: function(){
+        var current = {
+          width: self.doc.element[self.doc.prefix+'Width'],
+          height: self.doc.element[self.doc.prefix+'Height']
         }
+        // exit if window size have not changed
+        if(current.width == self.doc.width && current.height == self.doc.height){
+          if(!self.doc.last) return;
+          self.doc.last = undefined;
+          triggerHooks(self.events.afterdocumentresize);
+          return;
+        }
+        // set last
+        self.doc.last = true;
+        // set new document sizes
+        self.doc.width = current.width;
+        self.doc.height = current.height;
+        // loop throught hooks on resize event
+        triggerHooks(self.events.documentresize);
       },
 
       // detect if pointer has moved
@@ -196,20 +269,13 @@
         self.pointer = self.newPointer;
         self.newPointer = undefined;
         // loop throught hooks on pointermove event
-        for(var i=0; i<self.events.pointermove.length; i++){
-          var hook = self.events.pointermove[i];
-          hook.pointer = self.pointer;
-          hook.callback(hook);
-        }
+        triggerHooks(self.events.pointermove, {pointer:self.pointer});
       },
 
       // detect when next frame is rendered
       nextframe: function(){
         // loop throught hooks on nextframe event
-        for(var i=0; i<self.events.nextframe.length; i++){
-          var hook = self.events.nextframe[i];
-          hook.callback(hook);
-        }
+        triggerHooks(self.events.nextframe);
         // unset nextframe event, so it runs only once
         unset('nextframe', self.events);
         // update count
@@ -226,7 +292,7 @@
       // parse arguments into a new event
       var hook = hookObj.apply(this, arguments);
       // exit if event type is not set
-      if(!hook.event) return false;
+      if(!hook.event) return self;
       // create / append hook
       if(!self.events[hook.event]){
         // create new event
@@ -252,7 +318,7 @@
       // parse arguments into a new event
       var hook = hookObj.apply(this, arguments);
       // exit if event is not found
-      if(!self.events[hook.event]) return false;
+      if(!self.events[hook.event]) return self;
       // get event for this hook
       var event = self.events[hook.event];
       // remove whole event if is not set for a specific selection

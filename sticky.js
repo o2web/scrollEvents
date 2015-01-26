@@ -8,17 +8,16 @@
 
 (function($){
 
+	window.sticky = {
+		selection: []
+	}
+
 	function updateContainedOffset(e){
 		var $selection = (e.data && e.data.$selection) ? e.data.$selection : e;
-
-		// exit if already updating
-		if($selection && $selection.length && $selection[0].updatingSticky) return;
-
 		// loop throught selection
 		for(var s=0; s<$selection.length; s++){
 			var el = $selection[s];
 			var $el = $(el);
-			el.updatingSticky = true;
 			for(var i=0; i<el.ev.length; i++)
 				if(el.ev[i].flag=='sticked')
 					var options = el.ev[i];
@@ -26,9 +25,9 @@
 				el.$stickyClone = $el.clone();
 				el.$stickyClone.insertBefore($el);
 				el.$stickyClone[0].style.visibility = 'hidden';
-				el.$stickyClone[0].style.marginBottom = "-100%";
 				el.$stickyClone[0].style.position = el.initialStates.position;
 				el.$stickyClone[0].style.top = el.initialStates.top;
+				el.$stickyClone[0].style.marginBottom = '-'+el.$stickyClone.outerHeight()+'px';
 				options.topDown($.extend({selection:el.$stickyClone},options));
 				window.raf.on('nextframe', {$el:$el}, function(e){
 					var $el = e.data.$el;
@@ -38,9 +37,7 @@
 					});
 					el.$stickyClone.remove();
 					el.$stickyClone = undefined;
-					el.updatingSticky = undefined;
 				});
-				// console.log($el[0].ev[0]);
 			}
 		}
 	}
@@ -103,12 +100,8 @@
 				}
 
 				if(options.container){
-					// updateContainedOffset($selection);
-					// window.raf.off('resize', updateContainedOffset);
-					window.raf.on('resize', {$selection:$selection}, updateContainedOffset);
-					$win.on('load', {$selection:$selection}, function(e){
-						window.raf.on('nextframe', {$selection:e.data.$selection}, updateContainedOffset);
-					});
+					updateContainedOffset($selection);
+					window.raf.on('afterdocumentresize', {$selection:$selection}, updateContainedOffset);
 				}
 
 			}
@@ -144,6 +137,8 @@
 				});
 
 			}
+
 		}
 	});
+
 })(jQuery);
