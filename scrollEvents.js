@@ -45,25 +45,37 @@
 	}
 
 	// sort event by order option
-	sortEventsByOrder = function(a,b){
+	sortByOrder = function(a,b){
 		return 	a.order < b.order ? -1
 					: a.order > b.order ? 1
 					: 0
 	}
 
-	// sort events by closest to top
-	sortEventsByClosest = function(a,b){
-		var distA = a.topUp || a.topDown ?
-									Math.abs(se.t - a.t) :
-									Math.abs(se.b - a.b) ;
-		var distB = b.topUp || b.topDown ?
-									Math.abs(se.t - b.t) :
-									Math.abs(se.b - b.b) ;
-		console.log(distA + ' -------- ' + distB);
-		return 	distA < distB ? -1
-					: distA > distB ? 1
+	// // sort events by closest to top
+	// sortEventsByClosest = function(a,b){
+	// 	var distA = a.topUp || a.topDown ?
+	// 								Math.abs(se.t - a.t) :
+	// 								Math.abs(se.b - a.b) ;
+	// 	var distB = b.topUp || b.topDown ?
+	// 								Math.abs(se.t - b.t) :
+	// 								Math.abs(se.b - b.b) ;
+	// 	return 	distA < distB ? -1
+	// 				: distA > distB ? 1
+	// 				: 0
+	// }
+	// sort checks by closest to top
+	sortCallbacksByDistance = function(a,b){
+		var distA = a.e.topUp || a.e.topDown ?
+									Math.abs(se.t - a.e.t) :
+									Math.abs(se.b - a.e.b) ;
+		var distB = b.e.topUp || b.e.topDown ?
+									Math.abs(se.t - b.e.t) :
+									Math.abs(se.b - b.e.b) ;
+		return 	distA < distB ? 1
+					: distA > distB ? -1
 					: 0
 	}
+
 
 
 	//
@@ -75,8 +87,10 @@
 				( update && e.b <= se.t )
 			){
 			if(activate) e.isVisible=false;
-			if(callback) e.up(e);
+			if(!update && callback) e.up(e)
+			else if(update && callback) return e.up;
 		}
+		return false;
 	}
 	function checkDown(e, activate, callback, update){
 		if(
@@ -84,8 +98,10 @@
 				( update  && e.t >= se.b )
 			){
 			if(activate) e.isVisible=false;
-			if(callback) e.down(e);
+			if(!update && callback) e.down(e)
+			else if(update && callback) return e.down;
 		}
+		return false;
 	}
 	function checkVisible(e, activate, callback, update){
 		if(
@@ -93,8 +109,10 @@
 				( update && e.t < se.b && e.b > se.t)
 			){
 			if(activate) e.isVisible=true;
-			if(callback) e.visible(e);
+			if(!update && callback) e.visible(e)
+			else if(update && callback) return e.visible;
 		}
+		return false;
 	}
 	function checkTopUp(e, activate, callback, update){
 		if(
@@ -102,8 +120,10 @@
 				( update && e.t <= se.t )
 		){
 			if(activate) e.isTopVisible = false;
-			if(callback) e.topUp(e);
+			if(!update && callback) e.topUp(e)
+			else if(update && callback) return e.topUp;
 		}
+		return false;
 	}
 	function checkTopDown(e, activate, callback, update){
 
@@ -112,8 +132,10 @@
 				( update && e.t > se.t )
 		){
 			if(activate) e.isTopVisible = true;
-			if(callback) e.topDown(e);
+			if(!update && callback) e.topDown(e)
+			else if(update && callback) return e.topDown;
 		}
+		return false;
 	}
 	function checkBottomUp(e, activate, callback, update){
 
@@ -122,8 +144,10 @@
 				( update && e.b < se.b )
 		){
 			if(activate) e.isBottomVisible = false;
-			if(callback) e.bottomUp(e);
+			if(!update && callback) e.bottomUp(e)
+			else if(update && callback) return e.bottomUp;
 		}
+		return false;
 	}
 	function checkBottomDown(e, activate, callback, update){
 
@@ -132,8 +156,10 @@
 				( update && e.b >= se.b )
 		){
 			if(activate) e.isBottomVisible = true;
-			if(callback) e.bottomDown(e);
+			if(!update && callback) e.bottomDown(e)
+			else if(update && callback) return e.bottomDown;
 		}
+		return false;
 	}
 	function checkTravel(e, activate, callback, update){
 		if(
@@ -175,6 +201,7 @@
 		if(e.travel){
 			e.checks.push(
 				{
+					event: e,
 					fn: checkTravel,
 					activate: true,
 					callback: !!e.travel
@@ -184,16 +211,19 @@
 		if(e.up || e.checkdown || e.visible){
 			e.checks.push(
 				{
+					event: e,
 					fn: checkUp,
 					activate: true,
 					callback: !!e.up
 				},
 				{
+					event: e,
 					fn: checkDown,
 					activate: true,
 					callback: !!e.down
 				},
 				{
+					event: e,
 					fn: checkVisible,
 					activate: true,
 					callback: !!e.visible
@@ -204,28 +234,32 @@
 		if(e.topUp || e.topDown){
 			e.checks.push(
 				{
-					fn: checkTopUp,
-					activate: true,
-					callback: !!e.topUp
-				},
-				{
+					event: e,
 					fn: checkTopDown,
 					activate: true,
 					callback: !!e.topDown
+				},
+				{
+					event: e,
+					fn: checkTopUp,
+					activate: true,
+					callback: !!e.topUp
 				}
 			)
 		}
 		if(e.bottomUp || e.bottomDown){
 			e.checks.push(
 				{
-					fn: checkBottomUp,
-					activate: true,
-					callback: !!e.bottomUp
-				},
-				{
+					event: e,
 					fn: checkBottomDown,
 					activate: true,
 					callback: !!e.bottomDown
+				},
+				{
+					event: e,
+					fn: checkBottomUp,
+					activate: true,
+					callback: !!e.bottomUp
 				}
 			)
 		}
@@ -235,41 +269,34 @@
 	//
 	//
 	// FIRE EVENTS ON SCROLL
-	function eventScroller(){
+	function eventScroller(e){
+		if(typeof e == 'boolean'){
+			var update = true;
+			var stack = [];
+		}
 		se.t = $win.scrollTop();
 		se.b = se.t+se.wh;
 		for(var i=0; i<se.selection.length; i++){
 			var el = se.selection[i];
-			el.ev.sort(sortEventsByClosest);
+			// el.ev.sort(sortEventsByClosest);
 			for(var j=0; j<el.ev.length; j++) (function(e){
 				if(!e.disabled){
+					// e.checks.sort(sortChecksByClosest);
 					for(var k=0; k<e.checks.length; k++){
 						var c = e.checks[k];
-						c.fn(e, c.activate, c.callback);
+						var call = c.fn(e, c.activate, c.callback, update);
+						if(call) stack.push({callback: call, e:e});
 					}
 				}
 			})(el.ev[j]);
 		};
-	}
-
-	//
-	//
-	// FIRE EVENTS ON UPDATE
-	function updateScroller(){
-		se.t = $win.scrollTop();
-		se.b = se.t+se.wh;
-		for(var i=0; i<se.selection.length; i++){
-			var el = se.selection[i];
-			el.ev.sort(sortEventsByClosest);
-			for(var j=0; j<el.ev.length; j++) (function(e){
-				if(!e.disabled){
-					for(var k=0; k<e.checks.length; k++){
-						var c = e.checks[k];
-						c.fn(e, c.activate, c.callback, true);
-					}
-				}
-			})(el.ev[j]);
-		};
+		//if update, sort callbacks by distance from
+		if(update && stack.length){
+			stack.sort(sortCallbacksByDistance);
+			for(var s=0; s<stack.length; s++)
+				if(typeof stack[s].callback == 'function')
+					stack[s].callback(stack[s].e);
+		}
 	}
 
 	//
@@ -298,14 +325,11 @@
 	//
 	//
 	// RECALCULATE ON RESIZE
-	function resizeScroller(arg){
-			if(arg=='update'){
-				recalculate();
-				updateScroller();
-			}
-			else{
-				recalculate();
-			}
+	function resizeScroller(){
+		window.raf.on('nextframe', function(){
+			recalculate();
+			eventScroller(true);
+		});
 	}
 
 
@@ -458,6 +482,7 @@
 				e.travel = args.travel ? args.travel.clone() : false;
 
 				parseChecks(e);
+				e.checks.sort(sortByOrder);
 
 				//
 				//
@@ -479,7 +504,7 @@
 					this.ev = [];
 				}
 				this.ev.push(e);
-				this.ev.sort(sortEventsByOrder);
+				this.ev.sort(sortByOrder);
 			});
 
 			// un hook events, then rehook 'em
@@ -492,9 +517,7 @@
 	});
 
 	$(document).ready(function(){
-		window.raf.on('nextframe', function(){
-			resizeScroller('update');
-		});
+			resizeScroller();
 	})
 
 	// $win.on('load', function(){

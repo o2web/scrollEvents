@@ -32,6 +32,7 @@
 				window.raf.on('nextframe', {$el:$el}, function(e){
 					var $el = e.data.$el;
 					var el = $el[0];
+					if(!el.$stickyClone) return;
 					$el.scrollEvents('set','contained', {
 						offset: -(options.container.outerHeight() - el.$stickyClone.position().top - el.$stickyClone.outerHeight() - options.offsetBottom ) + options.offset
 					});
