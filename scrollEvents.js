@@ -6,8 +6,6 @@
 // All rights reserved
 // 2014
 
-
-
 (function($){
 	$win = $(window);
 
@@ -51,19 +49,7 @@
 					: 0
 	}
 
-	// // sort events by closest to top
-	// sortEventsByClosest = function(a,b){
-	// 	var distA = a.topUp || a.topDown ?
-	// 								Math.abs(se.t - a.t) :
-	// 								Math.abs(se.b - a.b) ;
-	// 	var distB = b.topUp || b.topDown ?
-	// 								Math.abs(se.t - b.t) :
-	// 								Math.abs(se.b - b.b) ;
-	// 	return 	distA < distB ? -1
-	// 				: distA > distB ? 1
-	// 				: 0
-	// }
-	// sort checks by closest to top
+	// sort callbacks by closest to top
 	sortCallbacksByDistance = function(a,b){
 		var distA = a.e.topUp || a.e.topDown ?
 									Math.abs(se.t - a.e.t) :
@@ -278,10 +264,8 @@
 		se.b = se.t+se.wh;
 		for(var i=0; i<se.selection.length; i++){
 			var el = se.selection[i];
-			// el.ev.sort(sortEventsByClosest);
 			for(var j=0; j<el.ev.length; j++) (function(e){
 				if(!e.disabled){
-					// e.checks.sort(sortChecksByClosest);
 					for(var k=0; k<e.checks.length; k++){
 						var c = e.checks[k];
 						var call = c.fn(e, c.activate, c.callback, update);
@@ -351,9 +335,17 @@
 		else if(args=='update'){
 			resizeScroller('update');
 		}
-		else if(args=='disable' || args=='enable' || args=='remove' || args=='set' || args=='eval'){
+		else if(
+			args=='disable' ||
+			args=='enable' ||
+			args=='remove' ||
+			args=='get' ||
+			args=='set' || 
+			args=='eval'
+		){
 			var selection = $(selection);
 			var removed = [];
+			var returned = [];
 			for(var i=0; i<selection.length; i++){
 				var it = selection[i];
 				if(it.ev){
@@ -391,7 +383,10 @@
 									if(ev.flag==flag){
 										if(args=='disable'){
 											ev.disabled = true;
-											if(ev.travel) window.raf.off(ev.container, 'scroll', ev.travel);
+											if(ev.travel)
+												window.raf.off(ev.container, 'scroll', ev.travel);
+											if(ev.disable && typeof ev.disable == 'function')
+												ev.disable(ev);
 										}
 										else if(args=='enable'){
 											ev.disabled = false;
@@ -399,9 +394,15 @@
 												e.isVisible = false;
 												checkTravel(ev, true, true);
 											}
+											if(ev.enable && typeof ev.enable == 'function')
+												ev.enable(ev);
 										}
-										else if(args=='set') $.extend(true, ev, options);
-
+										else if(args=='set'){
+											$.extend(true, ev, options);
+										}
+										else if(args=='get'){
+											returned.push(ev);
+										}
 									}
 								}
 								else{
@@ -416,7 +417,12 @@
 											checkTravel(ev, true, true);
 										}
 									}
-									else if(args=='set') $.extend(true, ev, options);
+									else if(args=='set'){
+										$.extend(true, ev, options);
+									}
+									else if(args=='get'){
+										returned.push(ev);
+									}
 								}
 							}
 						}
@@ -434,6 +440,9 @@
 				for(var i=0; i<se.selection.length; i++){
 					se.selection[i].ev.se = i;
 				}
+			}
+			else if(args=='get'){
+				return returned;
 			}
 		}
 		return selection;
@@ -467,6 +476,9 @@
 						bottomUp: false,
 						bottomDown: false,
 						travel: false,
+						//
+						disable: false,
+						enable: false,
 						//
 						isVisible: false,
 						isTopVisible: false,
@@ -520,8 +532,8 @@
 			resizeScroller();
 	})
 
-	// $win.on('load', function(){
-	// 	resizeScroller('update');
-	// });
+	$win.on('load', function(){
+		resizeScroller('update');
+	});
 
 })(jQuery);
