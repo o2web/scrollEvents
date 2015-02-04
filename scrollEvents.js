@@ -2,8 +2,6 @@
 //
 // O2 WEB
 // o2web.ca
-// Tous droits réservés
-// All rights reserved
 // 2014
 
 (function($){
