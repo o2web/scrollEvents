@@ -1,0 +1,33 @@
+{
+  "name": "scrollEvents",
+  "main": "scrollEvents.min.js",
+  "version": "1.0.0",
+  "authors": [
+    "Charles Thibault <cthibault@o2web.ca>"
+  ],
+  "description": "ScrollEvents allow you to trigger callbacks when elements reach certain points of page scroll",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "o2web",
+    "scroll",
+    "events",
+    "callbacks",
+    "animation"
+  ],
+  "license": "GPL v2",
+  "homepage": "o2web.ca",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "+demo"
+  ],
+  "dependencies": {
+    "jquery": "~1.11",
+    "o2-raf": "~1"
+  }
+}
