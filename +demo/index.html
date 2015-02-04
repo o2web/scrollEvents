@@ -7,17 +7,15 @@
     <link rel="stylesheet" href="assets/css/application.css">
     <script src="assets/js/modernizr.custom.js"></script>
      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="../raf.js"></script>
+    <script src="assets/js/raf.js"></script>
     <script src="../scrollEvents.js"></script>
-    <script src="../sticky.js"></script>
-    <script src="../parallax.js"></script>
     <script src="assets/js/demo.js"></script>
   </head>
   <body>
     <div class="wrapper">
 
     	<h1>
-    		<span class="blue">scrollEvents.js</span> <small>+</small> <span class="turquoise">sticky.js</span> <small>+</small> <span class="violet">parallax.js</span>
+    		<span class="blue">scrollEvents.js</span>
 				<div><small>now using requestAnimationFrame</small></div>
     	</h1>
 	  	<section class="intro dark">
@@ -133,36 +131,6 @@ $('.demo-3').scrollEvents({
 	  		</div>
 		</section>
 
-		<section class="demo-4 dark">
-	  		<h2>4</h2>
-	  		<div class="message sticky container">
-	  			<nav>
-	  				Sticky
-	  			</nav>
-	  		</div>
-	  		<div class="overlay delta"></div>
-
-		  	<div class="container">
-		  		<code class="eval">
-$('.demo-4 nav').sticky({
-	offset: 50,
-	offsetBottom: 50,
-	container: $('.demo-4 .sticky.container'),
-	fixed: function(e){
-		e.selection.removeClass('contained').addClass('sticked').html('Sticked');
-	},
-	contained: function(e){
-		e.selection.removeClass('sticked').addClass('contained').html('Contained');
-	},
-	reset: function(e){
-		e.selection.removeClass('sticked contained').html('Sticky');
-	}
-});
-				</code>
-	  		</div>
-		</section>
-
-
 		<section class="demo-5">
 	  		<h2>5</h2>
 	  		<div class="message container">
@@ -189,20 +157,6 @@ $('.demo-5 button').on('click', function(){
 	$('.demo-5').scrollEvents( active ? 'disable' : 'enable' );
 });
 
-$('.demo-5 button').sticky({
-	offset: 50,
-	offsetBottom: 50,
-	container: $('.demo-5'),
-	reset: function(e){
-		e.selection.removeClass('sticked contained');
-	},
-	fixed: function(e){
-		e.selection.removeClass('contained').addClass('sticked');
-	},
-	contained: function(e){
-		e.selection.removeClass('sticked').addClass('contained');
-	}
-});
 				</code>
 	  		</div>
 
@@ -213,59 +167,11 @@ $('.demo-5 button').sticky({
 
 		</section>
 
-		<section class="demo-6 dark">
-	  		<h2>6</h2>
-	  		<div class="message inverted container">
-	  			<nav>
-	  				Inverted Sticky
-	  			</nav>
-	  		</div>
-	  		<div class="overlay delta"></div>
-
-		  	<div class="container">
-		  		<code class="eval">
-// Désactivé dans le demo parce que ça met le message en position fixed quand on arrive sur la page.
-
-// $('.demo-6 nav').sticky({
-//	inverted: true,
-//	fixedTop: function(e){
-//		e.selection.addClass('fixed top');
-//	},
-//	scrolling: function(e){
-//		e.selection.removeClass('fixed top bottom');
-//	},
-//	fixedBottom: function(e){
-//		e.selection.addClass('fixed bottom');
-//	}
-// });
-				</code>
-	  		</div>
-		</section>
-
-		<section class="demo-parallax">
-	  		<h2>7</h2>
-	  		<div class="message container">
-	  			Effet <em class="violet">parallax</em>, avec scrollEvents&thinsp;!
-	  		</div>
-	  		<div class="overlay delta"></div>
-
-		  	<div class="container">
-		  		<code class="eval">
-// Parallax
-$('.demo-parallax [z]').parallax();
-
-
-				</code>
-	  		</div>
-
-  			<div class="circles">
-  				<div class="message container">
-  				</div>
-  			</div>
-
-		</section>
-
 		<section class="schema">
+
+				<div class="message container">
+	  			Comment ça marche ?
+	  		</div>
 
 		  	<div class="message container">
 		  		<div class="blue">$(window).on('scroll')</div>
@@ -278,8 +184,6 @@ $('.demo-parallax [z]').parallax();
 	  		</div>
 
 		</section>
-
-
 
 		<section class="enjoy dark">
 	  		<div class="message container">

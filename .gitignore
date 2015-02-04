@@ -1,2 +1,4 @@
+# unwanted files
 .DS_Store
-.sass-cache/
+.sass-cache
+bower_components/
