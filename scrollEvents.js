@@ -4,13 +4,31 @@
 // o2web.ca
 // 2014
 
-(function($){
+//
+//
+// DEFINE MODULE
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // Define AMD module
+    define(['jquery', 'raf'], factory);
+  } else {
+    // JQUERY INIT
+    factory(jQuery);
+  }
+}
+
+//
+//
+// MAIN CODE
+(this, function($){
+
+	var root = this;
 	$win = $(window);
 
 	//
 	//
 	// GLOBAL VARIABLES
-	window.scrollEvents = {
+	root.scrollEvents = {
 		selection: [],
 		t:$win.scrollTop(),
 		b:$win.height(),
@@ -155,14 +173,14 @@
 				( update && e.b <= scrollEvents.t )
 		){
 			if( activate&&!e.up ) e.isVisible=false;
-			if( callback || update ) e.rafref = window.raf.off(e.rafref, e.container, 'scroll', e.travel).ref;
+			if( callback || update ) e.rafref = root.raf.off(e.rafref, e.container, 'scroll', e.travel).ref;
 		}
 		if(
 				( e.isVisible && e.t >= scrollEvents.b ) ||
 				( update && e.t >= scrollEvents.b )
 		){
 			if( activate&&!e.down ) e.isVisible=false;
-			if( callback || update ) e.rafref = window.raf.off(e.rafref, e.container, 'scroll', e.travel).ref;
+			if( callback || update ) e.rafref = root.raf.off(e.rafref, e.container, 'scroll', e.travel).ref;
 		}
 		if(
 				( !e.isVisible && e.t < scrollEvents.b && e.b > scrollEvents.t ) ||
@@ -170,8 +188,8 @@
 		){
 			if(activate&&!e.visible) e.isVisible=true;
 			if(callback || update){
-				if(e.rafref) window.raf.off(e.rafref, e.container, 'scroll', e.travel);
-				e.rafref = window.raf.on(e.container, 'scroll', {
+				if(e.rafref) root.raf.off(e.rafref, e.container, 'scroll', e.travel);
+				e.rafref = root.raf.on(e.container, 'scroll', {
 					delta: function(){return minMax(Math.round( ( scrollEvents.t - (e.t - scrollEvents.wh) ) / ( e.h + e.offset + e.offsetBottom + scrollEvents.wh) * e.round)/e.round, 0, 1) },
 					selection: e.selection,
 					index: e.i,
@@ -313,7 +331,7 @@
 	//
 	// RECALCULATE ON RESIZE
 	function resizeScroller(){
-		window.raf.on('nextframe', function(){
+		root.raf.on('nextframe', function(){
 			recalculate();
 			eventScroller(true);
 		});
@@ -383,7 +401,7 @@
 										if(args=='disable'){
 											ev.disabled = true;
 											if(ev.travel)
-												window.raf.off(ev.container, 'scroll', ev.travel);
+												root.raf.off(ev.container, 'scroll', ev.travel);
 											if(ev.disable && typeof ev.disable == 'function')
 												ev.disable(ev);
 										}
@@ -407,7 +425,7 @@
 								else{
 									if(args=='disable'){
 										ev.disabled = true;
-										if(ev.travel) window.raf.off(ev.container, 'scroll', ev.travel);
+										if(ev.travel) root.raf.off(ev.container, 'scroll', ev.travel);
 									}
 									else if(args=='enable'){
 										ev.disabled = false;
@@ -436,7 +454,7 @@
 					if(el.scrollEvents)
 						for(var e=0; e<el.scrollEvents.length; e++)
 							if(el.scrollEvents[e].travel)
-								window.raf.off(el.scrollEvents[e].rafref, el.container, 'scroll', el.scrollEvents[e].travel);
+								root.raf.off(el.scrollEvents[e].rafref, el.container, 'scroll', el.scrollEvents[e].travel);
 					scrollEvents.selection.splice(el.scrollEvents.se,1);
 					el.scrollEvents = [];
 				}
@@ -446,8 +464,8 @@
 			}
 
 			if(args=='destroy' && !scrollEvents.selection.length){
-				window.raf.off(scrollEvents.scrollRafref, 'scroll', eventScroller);
-				window.raf.off(scrollEvents.resizeRafref, 'afterdocumentresize', resizeScroller);
+				root.raf.off(scrollEvents.scrollRafref, 'scroll', eventScroller);
+				root.raf.off(scrollEvents.resizeRafref, 'afterdocumentresize', resizeScroller);
 			}
 
 			if(args=='get'){
@@ -529,10 +547,10 @@
 			});
 
 			// un hook events, then rehook 'em
-			if(scrollEvents.scrollRafref != undefined) window.raf.off(scrollEvents.scrollRafref, 'scroll', eventScroller);
-			scrollEvents.scrollRafref = window.raf.on('scroll', eventScroller).ref;
-			if(scrollEvents.resizeRafref != undefined) window.raf.off(scrollEvents.resizeRafref, 'afterdocumentresize',  resizeScroller);
-			scrollEvents.resizeRafref = window.raf.on('afterdocumentresize', resizeScroller).ref;
+			if(scrollEvents.scrollRafref != undefined) root.raf.off(scrollEvents.scrollRafref, 'scroll', eventScroller);
+			scrollEvents.scrollRafref = root.raf.on('scroll', eventScroller).ref;
+			if(scrollEvents.resizeRafref != undefined) root.raf.off(scrollEvents.resizeRafref, 'afterdocumentresize',  resizeScroller);
+			scrollEvents.resizeRafref = root.raf.on('afterdocumentresize', resizeScroller).ref;
 			return this;
 		}
 	});
@@ -545,4 +563,4 @@
 		resizeScroller('update');
 	});
 
-})(jQuery);
+}));
