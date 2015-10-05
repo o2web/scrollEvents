@@ -1,7 +1,7 @@
 {
   "name": "scrollEvents",
   "main": "scrollEvents.js",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "authors": [
     "Charles Thibault <cthibault@o2web.ca>"
   ],
