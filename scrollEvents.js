@@ -313,6 +313,8 @@
 			var $el = $(scrollEvents.selection[i]);
 			var el = $el[0];
 			var h =  $el.outerHeight();
+			el.currentStates.position = el.style.position;
+			el.currentStates.top = el.style.top;
 			el.style.position = el.initialStates.position;
 			el.style.top = el.initialStates.top;
 			var t = Math.round($el.offset().top);
@@ -322,8 +324,8 @@
 				e.t = t - e.offset;
 				e.b = e.t + e.h + e.offsetBottom;
 			}
-			el.style.position = '';
-			el.style.top = '';
+			el.style.position = el.currentStates.position;
+			el.style.top = el.currentStates.top;
 		}
 	}
 
@@ -538,6 +540,7 @@
 					 	position: $(this).css('position'),
 					 	top: $(this).css('top')
 					};
+					this.currentStates = {};
 				}
 				if(!this.scrollEvents){
 					this.scrollEvents = [];
